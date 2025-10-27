@@ -1,0 +1,5 @@
+<%+header%>
+<h2><%:IGMP Proxy Status%></h2>
+<p><%:Configuration file:%> <strong>/etc/config/igmpproxy</strong></p>
+<pre><%=luci.sys.exec("ps | grep igmpproxy | grep -v grep")%></pre>
+<%+footer%>

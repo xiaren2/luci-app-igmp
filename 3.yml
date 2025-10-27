@@ -1,0 +1,55 @@
+name: Build luci-app-igmpproxy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build luci-app-igmpproxy (OpenWrt 23.05.0 - mediatek/filogic)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential ccache fastjar file g++ gawk gettext git libelf-dev \
+            libncurses5-dev libncursesw5-dev libssl-dev python3 python3-pip \
+            python3-setuptools rsync unzip wget zlib1g-dev xz-utils
+
+      - name: Download OpenWrt SDK
+        run: |
+          wget https://downloads.openwrt.org/releases/23.05.0/targets/mediatek/filogic/openwrt-sdk-23.05.0-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+          tar -xJf openwrt-sdk-23.05.0-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+          mv openwrt-sdk-23.05.0-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64 openwrt-sdk
+
+      - name: Prepare package (rsync, exclude sdk)
+        run: |
+          mkdir -p openwrt-sdk/package/luci-app-igmpproxy
+          rsync -av --delete \
+            --exclude 'openwrt-sdk' \
+            --exclude '.git' \
+            --exclude 'bin' \
+            --exclude '.github/workflows' \
+            --exclude '*.tar.xz' \
+            ./ openwrt-sdk/package/luci-app-igmpproxy/
+
+
+      - name: Build IPK
+        working-directory: openwrt-sdk
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+          make defconfig
+          make package/luci-app-igmpproxy/compile V=s
+
+      - name: Upload IPK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luci-app-igmpproxy
+          path: openwrt-sdk/bin/packages/**/luci-app-igmpproxy_*.ipk

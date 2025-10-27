@@ -1,0 +1,90 @@
+name: Build luci-app-igmpproxy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# 必须添加的权限设置
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build luci-app-igmpproxy (OpenWrt Snapshots - qualcommax/ipq60xx)
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 必须添加，否则无法创建标签
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential ccache fastjar file g++ gawk gettext git libelf-dev \
+            libncurses5-dev libncursesw5-dev libssl-dev python3 python3-pip \
+            python3-setuptools rsync unzip wget zlib1g-dev xz-utils zstd
+
+      - name: Download OpenWrt SDK
+        run: |
+          wget https://mirror-03.infra.openwrt.org/snapshots/targets/qualcommax/ipq60xx/openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+          tar -I zstd -xf openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+          mv openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64 openwrt-sdk
+
+      - name: Prepare package
+        run: |
+          mkdir -p openwrt-sdk/package/luci-app-igmpproxy
+          rsync -av --delete \
+            --exclude 'openwrt-sdk' \
+            --exclude '.git' \
+            --exclude 'bin' \
+            --exclude '.github/workflows' \
+            --exclude '*.tar.zst' \
+            ./ openwrt-sdk/package/luci-app-igmpproxy/
+
+      - name: Build package
+        working-directory: openwrt-sdk
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+          make defconfig
+          make package/luci-app-igmpproxy/compile V=s
+          
+          # 调试：确认文件生成路径
+          find bin/packages -name "luci-app-igmpproxy*" -ls
+          echo "Generated files:"
+          ls -la bin/packages/*/*/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luci-app-igmpproxy
+          path: |
+            openwrt-sdk/bin/packages/**/luci-app-igmpproxy*.apk
+            openwrt-sdk/bin/packages/**/luci-app-igmpproxy*.ipk
+          if-no-files-found: error
+
+      - name: Setup Git identity
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Create and push tag
+        run: |
+          TAG="v$(date +'%Y.%m.%d-%H%M')"
+          git tag $TAG
+          git push origin $TAG
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            openwrt-sdk/bin/packages/**/luci-app-igmpproxy*.apk
+            openwrt-sdk/bin/packages/**/luci-app-igmpproxy*.ipk
+          overwrite_files: true
+          token: ${{ secrets.GITHUB_TOKEN }}
