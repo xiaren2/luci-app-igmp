@@ -50,4 +50,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: luci-app-igmpproxy
-          path: openwrt-sdk/bin/packages/**/luci-app-igmpproxy_*.ipk
+          path: |
+             openwrt-sdk/bin/packages/**/luci-app-igmpproxy_*.ipk
+             openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.ipk
