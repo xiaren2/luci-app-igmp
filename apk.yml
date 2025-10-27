@@ -1,9 +1,6 @@
 name: Build luci-app-igmpproxy
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 # 必须添加的权限设置
