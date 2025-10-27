@@ -11,7 +11,7 @@ LUCI_PKGARCH:=all
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
-LUCI_LANGUAGES := zh-cn
+
 # 指定源文件目录
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
