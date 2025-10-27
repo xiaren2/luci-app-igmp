@@ -44,11 +44,6 @@ m = Map("igmpproxy", translate("IGMP Proxy"), translate("Configure IGMP Proxy fo
 s = m:section(TypedSection, "igmpproxy", translate("General Settings"))
 s.anonymous = true
 
--- 启用开关
-o = s:option(Flag, "enabled", translate("Enable IGMP Proxy"))
-o.default = 1
-o.rmempty = false
-
 -- Quick Leave
 o = s:option(Flag, "quickleave", translate("Quick Leave"))
 o.default = 1
@@ -75,25 +70,7 @@ o:value("", translate("Not specified"))      -- 未指定
 for _, net in ipairs(networks) do
     o:value(net)
 end
-o:value("_custom_", translate("Custom..."))  -- 自定义选项
 o.rmempty = true
-function o.write(self, section, value)
-    if value == "_custom_" then
-        local custom = luci.http.formvalue("cbid.igmpproxy." .. section .. ".network_custom")
-        if custom and #custom > 0 then
-            uci:set("igmpproxy", section, "network", custom)
-        end
-    else
-        Value.write(self, section, value)
-    end
-end
-function o.cfgvalue(self, section)
-    local val = uci:get("igmpproxy", section, "network")
-    if val and not (val == "" or val == "_custom_") and not table.contains(networks, val) then
-        self.default = "_custom_"
-    end
-    return val
-end
 
 -- Zone 区域
 o = s2:option(ListValue, "zone", translate("Zone"))
@@ -101,25 +78,7 @@ o:value("", translate("Not specified"))      -- 未指定
 for _, zone in ipairs(zones) do
     o:value(zone)
 end
-o:value("_custom_", translate("Custom..."))  -- 自定义选项
 o.rmempty = true
-function o.write(self, section, value)
-    if value == "_custom_" then
-        local custom = luci.http.formvalue("cbid.igmpproxy." .. section .. ".zone_custom")
-        if custom and #custom > 0 then
-            uci:set("igmpproxy", section, "zone", custom)
-        end
-    else
-        Value.write(self, section, value)
-    end
-end
-function o.cfgvalue(self, section)
-    local val = uci:get("igmpproxy", section, "zone")
-    if val and not (val == "" or val == "_custom_") and not table.contains(zones, val) then
-        self.default = "_custom_"
-    end
-    return val
-end
 
 -- 方向
 o = s2:option(ListValue, "direction", translate("Direction"))
