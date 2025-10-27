@@ -9,13 +9,13 @@ LUCI_TITLE:=LuCI Support for IGMP Proxy
 LUCI_DEPENDS:=+igmpproxy
 LUCI_PKGARCH:=all
 
-# 新增：声明语言目录
-LUCI_LANG:=zh_Hans
-
 include $(TOPDIR)/feeds/luci/luci.mk
 
+LUCI_LANGUAGES := zh-cn
+# 指定源文件目录
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
+# 安装阶段：将 LuCI 控制器、模型、视图文件复制到正确路径
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
@@ -26,22 +26,6 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DATA) ./luasrc/view/igmpproxy_status.htm $(1)/usr/lib/lua/luci/view/
 endef
 
-# ✅ 新增：语言文件编译与安装规则
-define Package/luci-i18n-igmpproxy-zh-cn/install
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(INSTALL_DATA) ./po/zh_Hans/igmpproxy.po $(1)/usr/lib/lua/luci/i18n/igmpproxy.zh-cn.po
-endef
-
-# ✅ 新增：生成中文语言包
-define Package/luci-i18n-igmpproxy-zh-cn
-  SECTION:=luci
-  CATEGORY:=LuCI
-  SUBMENU:=3. Applications
-  TITLE:=LuCI translation for IGMP Proxy (Simplified Chinese)
-  PKGARCH:=all
-  DEPENDS:=luci-app-igmpproxy
-endef
-
 # 调用标准构建规则
 $(eval $(call BuildPackage,$(PKG_NAME)))
-$(eval $(call BuildPackage,luci-i18n-igmpproxy-zh-cn))
+
