@@ -1,39 +1,39 @@
-name: Build luci-app-igmpproxy
+名称：构建 luci-app-igmpproxy
 
-on:
-  workflow_dispatch:
+在:
+  工作流触发:
 
 # 必须添加的权限设置
-permissions:
-  contents: write
+权限:
+  目录: 写
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    name: Build luci-app-igmpproxy (OpenWrt Snapshots - qualcommax/ipq60xx)
+工作:
+  构建:
+    运行于：ubuntu-latest
+    名称: 构建 luci-app-igmpproxy (OpenWrt 快照 - qualcommax/ipq60xx)
     
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 必须添加，否则无法创建标签
+    步骤:
+      - 名称: 检出仓库
+        使用：actions/checkout@v4
+        与：
+          取深度：0  # 必须添加，否则无法创建标签
 
-      - name: Install dependencies
-        run: |
+      - 名称: 安装依赖项
+        运行： |
           sudo apt-get update
-          sudo apt-get install -y \
+          请将以下文本翻译成中文:           sudo apt-get install -y \
             build-essential ccache fastjar file g++ gawk gettext git libelf-dev \
-            libncurses5-dev libncursesw5-dev libssl-dev python3 python3-pip \
+            libncurses5-dev libncursesw5-dev libssl-dev python3 python3-pip
             python3-setuptools rsync unzip wget zlib1g-dev xz-utils zstd
 
-      - name: Download OpenWrt SDK
-        run: |
+      - 名称: 下载 OpenWrt SDK
+        运行： |
           wget https://mirror-03.infra.openwrt.org/snapshots/targets/qualcommax/ipq60xx/openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64.tar.zst
           tar -I zstd -xf openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64.tar.zst
           mv openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64 openwrt-sdk
 
-      - name: Prepare package
-        run: |
+      - 名称: 准备包裹
+        运行： |
           mkdir -p openwrt-sdk/package/luci-app-igmpproxy
           rsync -av --delete \
             --exclude 'openwrt-sdk' \
