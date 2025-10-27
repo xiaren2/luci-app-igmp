@@ -1,7 +1,18 @@
 local m, s, o
 local fs = require "nixio.fs"
 local uci = require "luci.model.uci".cursor()
-
+-- 兼容 table.contains() 函数（新版 Luci/ucode 环境无此函数）
+if not table.contains then
+    function table.contains(tbl, val)
+        if not tbl or type(tbl) ~= "table" then return false end
+        for _, v in ipairs(tbl) do
+            if v == val then
+                return true
+            end
+        end
+        return false
+    end
+end
 -- 确保配置文件存在并设置默认值
 if not uci:get_first("igmpproxy", "igmpproxy") then
     uci:section("igmpproxy", "igmpproxy", nil, {
@@ -118,7 +129,7 @@ o.default = "downstream"
 
 -- Alt Network
 o = s2:option(DynamicList, "altnet", translate("Alt Network"))
-o.placeholder = "10.0.0.0/8"
+o.placeholder = "224.0.0.0/4"
 o.rmempty = true
 o.description = translate("Only valid for upstream interface. You can add multiple multicast ranges here.")
 
