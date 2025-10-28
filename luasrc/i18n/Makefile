@@ -25,4 +25,5 @@ define Package/luci-i18n-igmpproxy-zh-cn/install
 	chmod 0755 $(1)/etc/uci-defaults/luci-i18n-igmpproxy-zh-cn
 endef
 
+PKG_POSTINST:=:
 $(eval $(call BuildPackage,luci-i18n-igmpproxy-zh-cn))
