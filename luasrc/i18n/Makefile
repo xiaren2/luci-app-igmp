@@ -1,5 +1,9 @@
 include $(TOPDIR)/rules.mk
 
+PKG_NAME:=luci-i18n-igmpproxy-zh-cn
+PKG_VERSION:=1.0
+PKG_RELEASE:=1
+
 LUCI_TITLE:=IGMP Proxy Chinese language pack
 LUCI_DEPENDS:=+luci-base +luci-app-igmpproxy
 PKG_MAINTAINER:=OpenWrt Community
