@@ -28,7 +28,6 @@ o:value("2", "中等")
 o:value("3", "最大")
 o.default = "1"
 o.rmempty = false
-o.description = "设置日志输出的详细程度"
 
 -- 接口设置
 s2 = m:section(TypedSection, "phyint", "接口配置")
@@ -45,52 +44,27 @@ o.unspecified = true
 o.rmempty = false
 o.description = "选择要配置的物理网络接口"
 
--- 防火墙区域启用开关
-o = s2:option(Flag, "firewall_enabled", "启用防火墙区域绑定", 
-    "启用后需要选择具体的防火墙区域，禁用则相当于'未指定'")
-o.default = false
-o.rmempty = false
-
--- 官方防火墙区域选择器（动态显示）
+-- 使用官方防火墙区域选择器
 o = s2:option(ListValue, "zone", "防火墙区域")
 o.template = "cbi/firewall_zonelist"
 o.widget = "select"
-o:depends("firewall_enabled", "1")  -- 仅当启用时显示
-o.rmempty = true
-o.description = "选择接口所属的防火墙区域"
-
--- 自动处理zone值的保存逻辑
-function o.write(self, section, value)
-    if m:get(section, "firewall_enabled") ~= "1" then
-        m:del(section, "zone")  -- 禁用时自动清除zone配置
-    else
-        m:set(section, "zone", value)  -- 启用时保存zone值
-    end
-end
+o.rmempty = false
+o.description = "选择要配置的物理网络接口"
 
 -- 方向选择
 o = s2:option(ListValue, "direction", "方向")
-o:value("upstream", "上行 (连接到组播来源)")
+o:value("upstream", "上行 (连接到组播源)")
 o:value("downstream", "下行 (连接到接收设备)")
 o.default = "downstream"
 o.rmempty = false
 o.description = "设置接口的组播流向方向"
 
 -- 备用网络（仅对上行接口有效）
-o = s2:option(DynamicList, "altnet", "允许组播网络")
+o = s2:option(DynamicList, "altnet", "放行的网络段")
 o.placeholder = "10.0.0.0/8"
 o.datatype = "ip4addr"
 o.rmempty = true
 o:depends("direction", "upstream")
 o.description = "仅对上行接口有效。可添加多个组播地址/中转服务器范围。"
 
--- 自动迁移旧配置
-function m.on_parse(self)
-    uci:foreach("igmpproxy", "phyint", function(section)
-        if section.zone and section.zone ~= "" then
-            uci:set("igmpproxy", section[".name"], "firewall_enabled", "1")
-        end
-    end)
-end
-
-return m
+return m 
