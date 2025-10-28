@@ -64,6 +64,8 @@ jobs:
           path: |
             openwrt-sdk/bin/packages/**/luci-app-igmpproxy*.apk
             openwrt-sdk/bin/packages/**/luci-app-igmpproxy*.ipk
+            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.apk
+            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.ipk
           if-no-files-found: error
 
       - name: Setup Git identity
@@ -84,5 +86,8 @@ jobs:
           files: |
             openwrt-sdk/bin/packages/**/luci-app-igmpproxy*.apk
             openwrt-sdk/bin/packages/**/luci-app-igmpproxy*.ipk
+            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.apk
+            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.ipk
+            
           overwrite_files: true
           token: ${{ secrets.GITHUB_TOKEN }}
