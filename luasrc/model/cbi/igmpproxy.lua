@@ -53,15 +53,21 @@ s2.addremove = true
 s2.template = "cbi/tblsection"
 s2.anonymous = false
 
--- 网络接口
+-- 网络接口（官方风格）
 o = s2:option(ListValue, "network", translate("Network"))
 o:value("", translate("Not specified"))  -- 未指定
 for _, iface in ipairs(network:get_interfaces()) do
-    o:value(iface:name(), iface:display())
+    -- 生成描述文字，例如 "lan (static)" 或 "wan (dhcp)"
+    local desc = iface:name()
+    local proto = iface:proto() or ""
+    if proto ~= "" then
+        desc = string.format("%s (%s)", iface:name(), proto)
+    end
+    o:value(iface:name(), desc)
 end
 o.rmempty = true
 
--- 防火墙区域
+-- 防火墙区域（官方风格）
 o = s2:option(ListValue, "zone", translate("Zone"))
 o:value("", translate("Not specified"))  -- 未指定
 for _, z in ipairs(firewall:get_zones()) do
