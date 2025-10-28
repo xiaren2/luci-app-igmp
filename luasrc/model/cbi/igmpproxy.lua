@@ -2,6 +2,10 @@ local m, s, o
 local fs = require "nixio.fs"
 local uci = require "luci.model.uci".cursor()
 
+-- ✅ 初始化网络与防火墙模型（非常关键）
+local netm = require "luci.model.network".init()
+local fwm = require "luci.model.firewall".init()
+
 -- 兼容 table.contains() 函数（新版 Luci/ucode 环境无此函数）
 if not table.contains then
     function table.contains(tbl, val)
@@ -25,6 +29,10 @@ if not uci:get_first("igmpproxy", "igmpproxy") then
 end
 
 m = Map("igmpproxy", "IGMP代理设置", "配置IGMP代理以实现组播转发，igmpproxy仅支持ipv4。")
+
+-- 绑定网络、防火墙模型，让模板可以正常显示接口状态
+m.network = netm
+m.firewall = fwm
 
 -- 常规设置
 s = m:section(TypedSection, "igmpproxy", "常规设置")
