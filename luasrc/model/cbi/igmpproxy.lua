@@ -28,6 +28,7 @@ o:value("2", "中等")
 o:value("3", "最大")
 o.default = "1"
 o.rmempty = false
+o.description = "设置日志输出的详细程度"
 
 -- 接口设置
 s2 = m:section(TypedSection, "phyint", "接口配置")
@@ -44,16 +45,43 @@ o.unspecified = true
 o.rmempty = false
 o.description = "选择要配置的物理网络接口"
 
--- 使用官方防火墙区域选择器
+-- 自定义防火墙区域选择器（保持官方样式+未指定选项）
 o = s2:option(ListValue, "zone", "防火墙区域")
-o.template = "cbi/firewall_zonelist"
-o.widget = "select"
 o.rmempty = false
-o.description = "选择要配置的物理网络接口"
+o.description = "选择接口所属的防火墙区域"
+
+-- 值处理方法
+function o.cfgvalue(self, section)
+    return m:get(section, "zone") or ""
+end
+function o.formvalue(self, section)
+    return m:formvalue("cbid.igmpproxy."..section..".zone") or ""
+end
+function o.write(self, section, value)
+    if value == "" then
+        m:del(section, "zone")
+    else
+        m:set(section, "zone", value)
+    end
+end
+
+-- 动态加载区域（保持官方数据源）
+local zones = {}
+uci:foreach("firewall", "zone", function(s)
+    if s.name then
+        zones[s.name] = true
+    end
+end)
+
+-- 构建选项（官方区域+未指定）
+o:value("", "未指定")
+for zone, _ in pairs(zones) do
+    o:value(zone)
+end
 
 -- 方向选择
 o = s2:option(ListValue, "direction", "方向")
-o:value("upstream", "上行 (连接到组播源)")
+o:value("upstream", "上行 (连接到组播来源)")
 o:value("downstream", "下行 (连接到接收设备)")
 o.default = "downstream"
 o.rmempty = false
