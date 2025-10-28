@@ -10,7 +10,7 @@ if not uci:get_first("igmpproxy", "igmpproxy") then
     uci:commit("igmpproxy")
 end
 
-m = Map("igmpproxy", "IGMP代理", "配置IGMP代理以实现组播转发。")
+m = Map("igmpproxy", "IGMP代理", "配置IGMP代理以实现组播转发，igmpproxy仅支持ipv4。")
 
 -- 常规设置
 s = m:section(TypedSection, "igmpproxy", "常规设置")
@@ -28,12 +28,14 @@ o:value("2", "中等")
 o:value("3", "最大")
 o.default = "1"
 o.rmempty = false
+o.description = "设置日志输出的详细程度"
 
 -- 接口设置
 s2 = m:section(TypedSection, "phyint", "接口配置")
 s2.addremove = true
 s2.template = "cbi/tblsection"
 s2.anonymous = false
+s2.description = "通过观察 igmpproxy 日志来决定放行的 IP 段，并不一定是组播 IP 段。如不会查看请放行0.0.0.0/0"
 
 -- 使用官方网络接口选择器（带图标和状态显示）
 o = s2:option(ListValue, "network", "网络接口")
@@ -48,12 +50,13 @@ o.description = "选择要配置的物理网络接口"
 o = s2:option(ListValue, "zone", "防火墙区域")
 o.template = "cbi/firewall_zonelist"
 o.widget = "select"
-o.rmempty = false
-o.description = "选择要配置的物理网络接口"
+o.rmempty = true          -- 允许为空
+o:value("", "未配置")     -- 添加未配置选项
+o.description = "选择要配置的防火墙区域"
 
 -- 方向选择
 o = s2:option(ListValue, "direction", "方向")
-o:value("upstream", "上行 (连接到组播源)")
+o:value("upstream", "上行 (连接到组播来源)")
 o:value("downstream", "下行 (连接到接收设备)")
 o.default = "downstream"
 o.rmempty = false
