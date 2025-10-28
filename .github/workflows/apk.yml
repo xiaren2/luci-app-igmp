@@ -1,4 +1,4 @@
-name: Build luci-app-igmpproxy
+name: Build luci-app-igmpproxy-apk
 
 on:
 
