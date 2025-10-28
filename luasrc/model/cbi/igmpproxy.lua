@@ -4,7 +4,7 @@ local fs = require "nixio.fs"
 local network = require "luci.model.network".init()
 local firewall = require "luci.model.firewall".init(uci)
 
--- 兼容 table.contains() 函数（新版 Luci/ucode 环境无此函数）
+-- 兼容 table.contains()
 if not table.contains then
     function table.contains(tbl, val)
         if not tbl or type(tbl) ~= "table" then return false end
@@ -53,21 +53,18 @@ s2.addremove = true
 s2.template = "cbi/tblsection"
 s2.anonymous = false
 
--- 网络接口（官方风格）
+-- 网络接口
 o = s2:option(ListValue, "network", translate("Network"))
 o:value("", translate("Not specified"))  -- 未指定
 for _, iface in ipairs(network:get_interfaces()) do
-    -- 生成描述文字，例如 "lan (static)" 或 "wan (dhcp)"
-    local desc = iface:name()
-    local proto = iface:proto() or ""
-    if proto ~= "" then
-        desc = string.format("%s (%s)", iface:name(), proto)
-    end
-    o:value(iface:name(), desc)
+    local ifname = iface:name()
+    local proto = iface:get("proto") or "?"
+    local desc = string.format("%s (%s)", ifname, proto)
+    o:value(ifname, desc)
 end
 o.rmempty = true
 
--- 防火墙区域（官方风格）
+-- 防火墙区域
 o = s2:option(ListValue, "zone", translate("Zone"))
 o:value("", translate("Not specified"))  -- 未指定
 for _, z in ipairs(firewall:get_zones()) do
