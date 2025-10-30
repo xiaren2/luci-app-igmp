@@ -28,7 +28,7 @@ if not uci:get_first("igmpproxy", "igmpproxy") then
     uci:commit("igmpproxy")
 end
 
-m = Map("igmpproxy", "IGMP代理设置", "配置IGMP代理以实现组播转发，igmpproxy仅支持ipv4。")
+m = Map("igmpproxy", "IGMPPROXY设置", "配置IGMPPROXY以实现组播转发，igmpproxy仅支持ipv4。")
 
 -- 绑定网络、防火墙模型，让模板可以正常显示接口状态
 m.network = netm
