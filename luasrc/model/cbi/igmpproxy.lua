@@ -61,6 +61,14 @@ s2.anonymous = false
 s2.template = "cbi/tblsection"
 s2.description = "通过观察 igmpproxy 日志来决定放行的 IP 段，并不一定是组播 IP 段。如不会查看请放行0.0.0.0/0"
 
+-- 方向
+o = s2:option(ListValue, "direction", "方向")
+o:value("upstream", "上行 (连接到组播来源)")
+o:value("downstream", "下行 (连接到接收设备)")
+o.default = "downstream"
+o.rmempty = false
+o.description = "设置接口的组播流向方向"
+
 -- 使用OpenWrt官方风格的网络接口选择
 o = s2:option(Value, "network", "网络接口")
 o.template = "cbi/network_netlist"
@@ -75,14 +83,6 @@ o.nocreate = true
 o.unspecified = true
 o.rmempty = true
 o.description = "选择要配置的防火墙区域"
-
--- 方向
-o = s2:option(ListValue, "direction", "方向")
-o:value("upstream", "上行 (连接到组播来源)")
-o:value("downstream", "下行 (连接到接收设备)")
-o.default = "downstream"
-o.rmempty = false
-o.description = "设置接口的组播流向方向"
 
 -- Alt Network
 o = s2:option(DynamicList, "altnet", "放行网络段")
