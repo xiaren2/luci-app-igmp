@@ -163,7 +163,7 @@ end
 -- 添加一个空值选项
 o:value("", "-- 请选择接口 --")
 
-o.description = "选择要配置的网络接口（显示别名和物理接口对应关系）"
+o.description = "选择要配置的网络接口（优先别名）"
 
 -- 使用OpenWrt官方风格的防火墙区域选择
 o = s2:option(Value, "zone", "防火墙区域")
