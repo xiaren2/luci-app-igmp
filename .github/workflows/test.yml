@@ -1,27 +1,34 @@
-name: "Build luci-app-igmpproxy (multi-sdk: snapshot & 23.05)"
-
+name: Build luci-app-igmpproxy Multi-Arch
 
 on:
   workflow_dispatch:
 
 permissions:
   contents: write
-
-env:
-  PACKAGE_NAME: luci-app-igmpproxy
+  packages: write
 
 jobs:
-  # Snapshot build for qualcommax/ipq60xx (produces apk/ipk if available)
-  build_snapshot_ipq60xx:
+  build-multi-arch:
     runs-on: ubuntu-latest
-    name: Build (OpenWrt Snapshots - qualcommax/ipq60xx)
+    strategy:
+      matrix:
+        include:
+          - name: "qualcommax-ipq60xx-snapshot"
+            sdk_url: "https://mirror-03.infra.openwrt.org/snapshots/targets/qualcommax/ipq60xx/openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
+            extract_cmd: "tar -I zstd -xf"
+          - name: "mediatek-filogic-23.05.0"
+            sdk_url: "https://downloads.openwrt.org/releases/23.05.0/targets/mediatek/filogic/openwrt-sdk-23.05.0-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz"
+            extract_cmd: "tar -xJf"
+
+    name: Build luci-app-igmpproxy (${{ matrix.name }})
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install dependencies (snapshot)
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -29,171 +36,108 @@ jobs:
             libncurses5-dev libncursesw5-dev libssl-dev python3 python3-pip \
             python3-setuptools rsync unzip wget zlib1g-dev xz-utils zstd
 
-      - name: Download OpenWrt Snapshot SDK (qualcommax/ipq60xx)
+      - name: Download OpenWrt SDK
         run: |
-          SDK_URL="https://mirror-03.infra.openwrt.org/snapshots/targets/qualcommax/ipq60xx/openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
-          wget -q --show-progress "$SDK_URL"
-          tar -I zstd -xf $(basename "$SDK_URL")
-          mv openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64 openwrt-sdk
+          wget ${{ matrix.sdk_url }} -O sdk-archive
+          ${{ matrix.extract_cmd }} sdk-archive
+          SDK_DIR=$(tar -tf sdk-archive | head -1 | cut -f1 -d"/")
+          mv "$SDK_DIR" openwrt-sdk
 
-      - name: Prepare package into SDK (snapshot)
+      - name: Prepare package
         run: |
-          mkdir -p openwrt-sdk/package/${PACKAGE_NAME}
+          mkdir -p openwrt-sdk/package/luci-app-igmpproxy
           rsync -av --delete \
             --exclude 'openwrt-sdk' \
             --exclude '.git' \
             --exclude 'bin' \
             --exclude '.github/workflows' \
-            --exclude '*.tar.zst' \
-            ./ openwrt-sdk/package/${PACKAGE_NAME}/
+            --exclude '*.tar.*' \
+            --exclude 'sdk-archive' \
+            ./ openwrt-sdk/package/luci-app-igmpproxy/
 
-      - name: Build package (snapshot)
+      - name: Build package
         working-directory: openwrt-sdk
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           make defconfig
-          make package/${PACKAGE_NAME}/compile V=s || true
-          # 调试：确认文件生成路径
-          echo "=== find matching packages ==="
-          find bin/packages -name "${PACKAGE_NAME}*" -ls || true
-          echo "=== list bin/packages dirs ==="
-          ls -la bin/packages || true
+          make package/luci-app-igmpproxy/compile V=s
+          echo "=== 编译生成的文件 ==="
+          find bin/packages -type f \( -name "*.ipk" -o -name "*.apk" \) || true
 
-      - name: Upload snapshot artifact (apk/ipk)
+      - name: Copy packages to staging
+        shell: bash
+        run: |
+          shopt -s globstar
+          mkdir -p packages-staging/${{ matrix.name }}
+          find openwrt-sdk/bin/packages -type f \( -name "luci-app-igmpproxy*.ipk" -o -name "luci-i18n-igmpproxy*.ipk" -o -name "*.apk" \) \
+            -exec cp {} packages-staging/${{ matrix.name }}/ \;
+          echo "=== 暂存区文件 ==="
+          ls -la packages-staging/${{ matrix.name }}/ || echo "⚠️ 无文件"
+
+      - name: Upload packages to staging
         uses: actions/upload-artifact@v4
         with:
-          name: snapshot-packages
-          path: |
-            openwrt-sdk/bin/packages/**/${PACKAGE_NAME}*.apk
-            openwrt-sdk/bin/packages/**/${PACKAGE_NAME}*.ipk
-            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.apk
-            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.ipk
+          name: packages-staging-${{ matrix.name }}
+          path: packages-staging/${{ matrix.name }}/
+          retention-days: 3
           if-no-files-found: warn
 
-  # Build for OpenWrt 23.05 (mediatek/filogic)
-  build_23_mediatek:
+  create-release:
     runs-on: ubuntu-latest
-    name: Build (OpenWrt 23.05.0 - mediatek/filogic)
+    needs: build-multi-arch
+    name: Create Release and Upload Packages
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install dependencies (23.05)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential ccache fastjar file g++ gawk gettext git libelf-dev \
-            libncurses5-dev libncursesw5-dev libssl-dev python3 python3-pip \
-            python3-setuptools rsync unzip wget zlib1g-dev xz-utils
-
-      - name: Download OpenWrt SDK (23.05 mediatek/filogic)
-        run: |
-          SDK_URL="https://downloads.openwrt.org/releases/23.05.0/targets/mediatek/filogic/openwrt-sdk-23.05.0-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz"
-          wget -q --show-progress "$SDK_URL"
-          tar -xJf $(basename "$SDK_URL")
-          mv openwrt-sdk-23.05.0-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64 openwrt-sdk
-
-      - name: Prepare package into SDK (23.05)
-        run: |
-          mkdir -p openwrt-sdk/package/${PACKAGE_NAME}
-          rsync -av --delete \
-            --exclude 'openwrt-sdk' \
-            --exclude '.git' \
-            --exclude 'bin' \
-            --exclude '.github/workflows' \
-            --exclude '*.tar.xz' \
-            ./ openwrt-sdk/package/${PACKAGE_NAME}/
-
-      - name: Build IPK (23.05)
-        working-directory: openwrt-sdk
-        run: |
-          ./scripts/feeds update -a
-          ./scripts/feeds install -a
-          make defconfig
-          make package/${PACKAGE_NAME}/compile V=s || true
-          echo "=== find matching packages ==="
-          find bin/packages -name "${PACKAGE_NAME}*" -ls || true
-          echo "=== list bin/packages dirs ==="
-          ls -la bin/packages || true
-
-      - name: Upload 23.05 artifact (ipk/apk)
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-packages-23.05
-          path: |
-            openwrt-sdk/bin/packages/**/${PACKAGE_NAME}*.ipk
-            openwrt-sdk/bin/packages/**/${PACKAGE_NAME}*.apk
-            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.ipk
-            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy-zh-cn_*.apk
-          if-no-files-found: warn
-
-  # Final job: collect artifacts, create tag, and publish Release
-  release:
-    name: Publish Release (collect artifacts & create tag)
-    runs-on: ubuntu-latest
-    needs:
-      - build_snapshot_ipq60xx
-      - build_23_mediatek
-    steps:
-      - name: Download snapshot artifacts
+      - name: Download all packages
         uses: actions/download-artifact@v4
         with:
-          name: snapshot-packages
-          path: ./artifacts/snapshot || true
+          pattern: packages-staging-*
+          path: downloaded-packages
+          merge-multiple: true
 
-      - name: Download 23.05 artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: release-packages-23.05
-          path: ./artifacts/23.05 || true
-
-      - name: Show downloaded artifacts (debug)
-        run: |
-          echo "=== artifacts/snapshot ==="
-          ls -la artifacts/snapshot || true
-          echo "=== artifacts/23.05 ==="
-          ls -la artifacts/23.05 || true
-
-      - name: Setup Git identity (for tagging)
+      - name: Setup Git identity
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-      - name: Create a timestamp tag and push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create version tag
         run: |
-          # create a timestamp tag
           TAG="v$(date +'%Y.%m.%d-%H%M')"
-          echo "Creating tag $TAG"
-          git tag "$TAG"
-          git push origin "$TAG"
           echo "TAG=$TAG" >> $GITHUB_ENV
+          git tag $TAG
+          git push origin $TAG
 
-      - name: Prepare files list for release
-        id: prep
+      - name: Verify package files
         run: |
-          mkdir -p release-files
-          # copy anything that looks like apk/ipk from downloaded artifact dirs
-          find artifacts -type f \( -iname "*.apk" -o -iname "*.ipk" \) -exec cp {} release-files/ \; || true
-          echo "Copied files:"
-          ls -la release-files || true
-          # produce a newline-separated file list for action input (softprops accepts globs, but we will reference release-files/*)
-          FILES="$(ls -1 release-files || true)"
-          echo "::set-output name=files::$FILES"
+          echo "=== 准备发布的文件列表 ==="
+          find downloaded-packages -type f \( -name "*.ipk" -o -name "*.apk" \) || exit 1
 
-      - name: Create GitHub Release and upload files
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
-          files: release-files/*
-          overwrite_files: true
+          name: "luci-app-igmpproxy Build ${{ env.TAG }}"
+          body: |
+            Multi-architecture build of luci-app-igmpproxy
+            
+            **支持的架构:**
+            - qualcommax/ipq60xx (OpenWrt Snapshots)
+            - mediatek/filogic (OpenWrt 23.05.0)
+            
+            **包含的文件:**
+            - luci-app-igmpproxy (主程序)
+            - luci-i18n-igmpproxy-zh-cn (中文语言包)
+            
+            **构建时间:** ${{ github.workflow_run.created_at }}
+          files: |
+            downloaded-packages/**/*.ipk
+            downloaded-packages/**/*.apk
+          draft: false
+          prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Confirm release created (debug)
-        run: |
-          echo "Release for tag $TAG should be created (if push succeeded)."
-
