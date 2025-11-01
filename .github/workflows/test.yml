@@ -1,4 +1,4 @@
-name: Build luci-app-igmpproxy Multi-Arch
+name: Build luci-app-igmpproxy Multi-Arch1
 
 on:
   workflow_dispatch:
