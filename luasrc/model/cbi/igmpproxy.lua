@@ -71,8 +71,8 @@ o.rmempty = false
 o.description = "设置接口的组播流向方向"
 
 -- 手动构建网络接口列表（显示别名和物理接口）
-o = s2:option(ListValue, "network", "网络接口")
-o.nocreate = true
+o = s2:option(Value, "network", "网络接口")  -- 改为 Value 类型以支持自定义输入
+o.nocreate = false
 o.unspecified = true 
 o.rmempty = true
 -- 获取所有网络接口和别名信息
@@ -126,7 +126,10 @@ for _, iface in ipairs(ifaces) do
         end
     end
 end
-    
+
+-- 首先添加空值选项
+o:value("", "-- 请选择接口 --")
+
 -- 添加接口到选项列表（Emoji 美化）
 for ifname, info in pairs(interface_map) do
     local icon, display_text
@@ -175,15 +178,12 @@ for alias, physical in pairs(alias_to_physical) do
     end
 end
 
--- 添加一个空值选项
-o:value("", "-- 请选择接口 --")
-
-o.description = "选择要配置的网络接口（优先别名）"
+o.description = "选择要配置的网络接口（优先别名），或选择自定义输入"
 
 -- 使用OpenWrt官方风格的防火墙区域选择
 o = s2:option(Value, "zone", "防火墙区域")
 o.template = "cbi/firewall_zonelist"
-o.nocreate = true
+o.nocreate = false
 o.unspecified = true
 o.rmempty = true
 o.description = "选择要配置的防火墙区域"
@@ -195,4 +195,4 @@ o.rmempty = true
 o:depends("direction", "upstream")
 o.description = "仅对上行接口有效。可以添加多个组播地址/中转范围。"
 
-return m 
+return m
