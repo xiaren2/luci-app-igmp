@@ -3,10 +3,8 @@ name: Build luci-app-igmpproxy Multi-Arch
 on:
   workflow_dispatch:
 
-# 必须添加的权限设置
 permissions:
   contents: write
-  packages: write
 
 jobs:
   build-multi-arch:
@@ -29,7 +27,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 必须添加，否则无法创建标签
+          fetch-depth: 0
 
       - name: Install dependencies
         run: |
@@ -43,7 +41,6 @@ jobs:
         run: |
           wget ${{ matrix.target.sdk_url }} -O sdk-archive
           ${{ matrix.target.extract_cmd }} sdk-archive
-          # 自动检测并重命名 SDK 目录
           SDK_DIR=$(tar -tf sdk-archive | head -1 | cut -f1 -d"/")
           mv "$SDK_DIR" openwrt-sdk
 
@@ -56,7 +53,6 @@ jobs:
             --exclude 'bin' \
             --exclude '.github/workflows' \
             --exclude '*.tar.*' \
-            --exclude 'sdk-archive' \
             ./ openwrt-sdk/package/luci-app-igmpproxy/
 
       - name: Build package
@@ -67,39 +63,21 @@ jobs:
           make defconfig
           make package/luci-app-igmpproxy/compile V=s
           
-          # 调试：确认文件生成路径
-          echo "=== 生成的文件列表 ==="
-          find bin/packages -name "luci-app-igmpproxy*" -o -name "luci-i18n-igmpproxy*" | while read file; do
-            echo "找到文件: $file"
-            ls -la "$file"
-          done
+          # 确保构建目录存在
+          mkdir -p $GITHUB_WORKSPACE/packages/${{ matrix.target.name }}
+          
+          # 复制所有相关文件
+          find bin/packages -name "luci-app-igmpproxy*" -o -name "luci-i18n-igmpproxy*" -exec cp {} $GITHUB_WORKSPACE/packages/${{ matrix.target.name}}/ \;
+          
+          echo "=== 复制的文件 ==="
+          ls -la $GITHUB_WORKSPACE/packages/${{ matrix.target.name }}/
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: luci-app-igmpproxy-${{ matrix.target.name }}
-          path: |
-            openwrt-sdk/bin/packages/**/luci-app-igmpproxy*
-            openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy*
-          retention-days: 7
-          if-no-files-found: warn
-
-      - name: Copy packages to staging
-        run: |
-          mkdir -p packages-staging/${{ matrix.target.name }}
-          cp openwrt-sdk/bin/packages/**/luci-app-igmpproxy* packages-staging/${{ matrix.target.name }}/ 2>/dev/null || true
-          cp openwrt-sdk/bin/packages/**/luci-i18n-igmpproxy* packages-staging/${{ matrix.target.name }}/ 2>/dev/null || true
-          
-          echo "=== 复制到暂存区的文件 ==="
-          ls -la packages-staging/${{ matrix.target.name }}/
-
-      - name: Upload packages to staging
-        uses: actions/upload-artifact@v4
-        with:
-          name: all-packages-staging
-          path: packages-staging/
+          name: packages-${{ matrix.target.name }}
+          path: $GITHUB_WORKSPACE/packages/${{ matrix.target.name }}/
           retention-days: 1
-          if-no-files-found: warn
 
   create-release:
     runs-on: ubuntu-latest
@@ -112,11 +90,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download all packages
-        uses: actions/download-artifact@v4
-        with:
-          pattern: all-packages-staging
-          path: downloaded-packages
+      - name: Download all artifacts
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/release-packages
+          for target in qualcommax-ipq60xx-snapshot mediatek-filogic-23.05.0; do
+            gh run download $GITHUB_RUN_ID -n packages-$target -D $GITHUB_WORKSPACE/release-packages/$target
+          done
+          
+          echo "=== 下载的文件 ==="
+          find $GITHUB_WORKSPACE/release-packages -type f | xargs ls -la
 
       - name: Setup Git identity
         run: |
@@ -130,34 +112,23 @@ jobs:
           git tag $TAG
           git push origin $TAG
 
-      - name: List all package files
-        run: |
-          echo "=== 准备发布的文件列表 ==="
-          find downloaded-packages -type f -name "*.ipk" -o -name "*.apk" | while read file; do
-            echo "发布文件: $file"
-            ls -la "$file"
-          done
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
-          name: "luci-app-igmpproxy Build ${{ env.TAG }}"
+          name: "luci-app-igmpproxy ${{ env.TAG }}"
           body: |
             Multi-architecture build of luci-app-igmpproxy
             
-            **支持的架构:**
+            **Supported architectures:**
             - qualcommax/ipq60xx (OpenWrt Snapshots)
             - mediatek/filogic (OpenWrt 23.05.0)
             
-            **包含的文件:**
-            - luci-app-igmpproxy (主程序)
-            - luci-i18n-igmpproxy-zh-cn (中文语言包)
-            
-            **构建时间:** ${{ github.workflow_run.created_at }}
+            **Included packages:**
+            - luci-app-igmpproxy
+            - luci-i18n-igmpproxy-zh-cn (Chinese language pack)
           files: |
-            downloaded-packages/**/*.ipk
-            downloaded-packages/**/*.apk
+            $GITHUB_WORKSPACE/release-packages/**/*
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
