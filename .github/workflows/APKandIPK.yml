@@ -5,25 +5,23 @@ on:
 
 permissions:
   contents: write
-  packages: read
+  packages: write
 
 jobs:
   build-multi-arch:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target:
+        include:
           - name: "qualcommax-ipq60xx-snapshot"
             sdk_url: "https://mirror-03.infra.openwrt.org/snapshots/targets/qualcommax/ipq60xx/openwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
-            archive_type: "zstd"
             extract_cmd: "tar -I zstd -xf"
           - name: "mediatek-filogic-23.05.0"
             sdk_url: "https://downloads.openwrt.org/releases/23.05.0/targets/mediatek/filogic/openwrt-sdk-23.05.0-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz"
-            archive_type: "xz"
             extract_cmd: "tar -xJf"
 
-    name: Build luci-app-igmpproxy (${{ matrix.target.name }})
-    
+    name: Build luci-app-igmpproxy (${{ matrix.name }})
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,8 +38,8 @@ jobs:
 
       - name: Download OpenWrt SDK
         run: |
-          wget ${{ matrix.target.sdk_url }} -O sdk-archive
-          ${{ matrix.target.extract_cmd }} sdk-archive
+          wget ${{ matrix.sdk_url }} -O sdk-archive
+          ${{ matrix.extract_cmd }} sdk-archive
           SDK_DIR=$(tar -tf sdk-archive | head -1 | cut -f1 -d"/")
           mv "$SDK_DIR" openwrt-sdk
 
@@ -64,40 +62,39 @@ jobs:
           ./scripts/feeds install -a
           make defconfig
           make package/luci-app-igmpproxy/compile V=s
-          
-          echo "=== 生成的文件列表 ==="
-          find bin/packages -name "luci-app-igmpproxy*" -o -name "luci-i18n-igmpproxy*" | while read file; do
-            echo "找到文件: $file"
-            ls -la "$file"
-          done
+          echo "=== 编译生成的文件 ==="
+          find bin/packages -type f \( -name "luci-app-igmpproxy*.ipk" -o -name "luci-i18n-igmpproxy*.ipk" -o -name "luci-app-igmpproxy*.apk" -o -name "luci-i18n-igmpproxy*.apk" \) || true
 
       - name: Copy packages to staging
+        shell: bash
         run: |
-          mkdir -p packages-staging
-          
-          # 使用 find 命令确保找到所有文件
-          find openwrt-sdk/bin/packages -name "luci-app-igmpproxy*" -o -name "luci-i18n-igmpproxy*" | while read file; do
-            echo "复制文件: $file"
-            cp "$file" packages-staging/
-          done
-          
-          echo "=== 复制到暂存区的文件 ==="
-          ls -la packages-staging/
+          shopt -s globstar
+          mkdir -p packages-staging/${{ matrix.name }}
+
+          # 只复制主程序和语言包
+          find openwrt-sdk/bin/packages -type f \( \
+              -name "luci-app-igmpproxy*.ipk" -o \
+              -name "luci-i18n-igmpproxy*.ipk" -o \
+              -name "luci-i18n-igmpproxy*.apk" -o \
+              -name "luci-app-igmpproxy*.apk" \
+            \) -exec cp -v {} packages-staging/${{ matrix.name }}/ \;
+
+          echo "=== 暂存区文件 ==="
+          ls -la packages-staging/${{ matrix.name }}/ || echo "⚠️ 无文件"
 
       - name: Upload packages to staging
         uses: actions/upload-artifact@v4
         with:
-          name: packages-${{ matrix.target.name }}  # 为每个架构使用唯一名称
-          path: packages-staging/
-          retention-days: 1
-          if-no-files-found: error
+          name: packages-staging-${{ matrix.name }}
+          path: packages-staging/${{ matrix.name }}/
+          retention-days: 3
+          if-no-files-found: warn
 
   create-release:
     runs-on: ubuntu-latest
-    name: Create Release and Upload Packages
     needs: build-multi-arch
-    if: always()
-    
+    name: Create Release and Upload Packages
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -105,86 +102,41 @@ jobs:
           fetch-depth: 0
 
       - name: Download all packages
-        run: |
-          mkdir -p downloaded-packages
-          
-          # 为每个架构下载对应的 artifact
-          for arch in qualcommax-ipq60xx-snapshot mediatek-filogic-23.05.0; do
-            echo "下载架构 $arch 的包..."
-            if gh run download ${{ github.run_id }} -n packages-$arch 2>/dev/null; then
-              echo "成功下载 $arch 的包"
-            else
-              echo "警告: 无法下载 $arch 的包"
-            fi
-          done
-          
-          # 备选方案：使用 actions/download-artifact
-          echo "=== 备选下载方案 ==="
-          gh api -H "Accept: application/vnd.github+json" \
-            "/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" | \
-            jq -r '.artifacts[] | select(.name | startswith("packages-")) | .name' | \
-            while read artifact_name; do
-              echo "下载 artifact: $artifact_name"
-              gh run download ${{ github.run_id }} -n "$artifact_name" -D downloaded-packages/"$artifact_name" || true
-            done
+        uses: actions/download-artifact@v4
+        with:
+          pattern: packages-staging-*
+          path: downloaded-packages
+          merge-multiple: true
 
-      - name: Debug - List downloaded files
+      - name: Verify package files
         run: |
-          echo "=== 下载的文件结构 ==="
-          find downloaded-packages -type f 2>/dev/null | while read file; do
-            echo "文件: $file"
-            ls -la "$file"
-          done || echo "没有找到文件"
-          
-          echo "=== 目录结构 ==="
-          find downloaded-packages -type d 2>/dev/null | sort
-
-      - name: Collect all package files
-        run: |
-          mkdir -p release-packages
-          
-          # 收集所有包文件到统一目录
-          find downloaded-packages -name "*.ipk" -o -name "*.apk" | while read file; do
-            if [ -f "$file" ]; then
-              filename=$(basename "$file")
-              echo "收集文件: $filename"
-              cp "$file" release-packages/
-            fi
-          done
-          
-          echo "=== 准备发布的文件 ==="
-          ls -la release-packages/ || echo "release-packages 目录为空"
-
-      - name: Setup Git identity
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-      - name: Create version tag
-        run: |
-          TAG="v$(date +'%Y.%m.%d-%H%M')"
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          git tag $TAG
-          git push origin $TAG
+          found=$(find downloaded-packages -type f \( -name "luci-app-igmpproxy*.ipk" -o -name "luci-i18n-igmpproxy*.ipk" -o -name "luci-app-igmpproxy*.apk" -o -name "luci-app-igmpproxy*.apk" \) | wc -l)
+          if [ "$found" -eq 0 ]; then
+            echo "未找到任何 luci-app-igmpproxy 或语言包，停止发布。"
+            exit 1
+          fi
+          echo "Found $found package(s) to release."
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.TAG }}
-          name: "luci-app-igmpproxy Build ${{ env.TAG }}"
+          tag_name: v${{ github.run_number }}
+          name: "luci-app-igmpproxy Build v${{ github.run_number }}"
           body: |
             Multi-architecture build of luci-app-igmpproxy
             
             **支持的架构:**
-            - qualcommax/ipq60xx (OpenWrt Snapshots) - .apk 格式
-            - mediatek/filogic (OpenWrt 23.05.0) - .ipk 格式
+            - qualcommax/ipq60xx (OpenWrt Snapshots)
+            - mediatek/filogic (OpenWrt 23.05.0)
             
             **包含的文件:**
             - luci-app-igmpproxy (主程序)
             - luci-i18n-igmpproxy-zh-cn (中文语言包)
             
             **构建时间:** ${{ github.workflow_run.created_at }}
-          files: release-packages/*
+          files: |
+            downloaded-packages/**/*.ipk
+            downloaded-packages/**/*.apk
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
