@@ -126,37 +126,52 @@ for _, iface in ipairs(ifaces) do
         end
     end
 end
-
--- 添加接口到选项列表
+    
+-- 添加接口到选项列表（Emoji 美化）
 for ifname, info in pairs(interface_map) do
-    local display_text = ifname
-    
-    -- 添加接口类型描述
+    local icon, display_text
+
     if ifname == "lo" then
-        display_text = display_text .. " (回环接口)"
+        icon = "🔴"
+        display_text = "回环: " .. ifname
     elseif ifname:match("^br-") then
-        display_text = display_text .. " (网桥)"
+        icon = "🟢"
+        display_text = "网桥: " .. ifname
     elseif ifname:match("^eth") then
-        display_text = display_text .. " (以太网)"
-    elseif ifname:match("^wlan") or ifname:match("^ath") then
-        display_text = display_text .. " (无线)"
+        icon = "🔌"
+        display_text = "以太网: " .. ifname
+    elseif ifname:match("^wlan") or ifname:match("^ath") or ifname:match("^radio") then
+        icon = "📶"
+        display_text = "无线: " .. ifname
     elseif ifname:match("^tun") or ifname:match("^tap") then
-        display_text = display_text .. " (隧道)"
-    elseif ifname:match("^ppp") then
-        display_text = display_text .. " (PPP)"
+        icon = "🌐"
+        display_text = "隧道: " .. ifname
+    elseif ifname:match("^ppp") or ifname:match("^pppoe") then
+        icon = "📞"
+        display_text = "PPP: " .. ifname
+    elseif ifname:match("^usb") then
+        icon = "💻"
+        display_text = "USB: " .. ifname
+    elseif ifname:match("^vlan") then
+        icon = "🏷️"
+        display_text = "VLAN: " .. ifname
+    elseif ifname:match("^gre") then
+        icon = "🔄"
+        display_text = "GRE: " .. ifname
     else
-        display_text = display_text .. " (网络接口)"
+        icon = "⚙️"
+        display_text = "网络: " .. ifname
     end
-    
-    
-    o:value(ifname, display_text)
+
+    o:value(ifname, icon .. " " .. display_text)
 end
 
--- 添加别名接口本身（如果它们有独立的配置）
+-- 添加别名接口
 for alias, physical in pairs(alias_to_physical) do
     if not interface_map[alias] then
-        local display_text = alias .. " (" .. physical .. ")"
-        o:value(alias, display_text)
+        local icon = "🏷️"
+        local display_text = "别名: " .. alias .. " (" .. physical .. ")"
+        o:value(alias, icon .. " " .. display_text)
     end
 end
 
@@ -180,4 +195,4 @@ o.rmempty = true
 o:depends("direction", "upstream")
 o.description = "仅对上行接口有效。可以添加多个组播地址/中转范围。"
 
-return m
+return m 
