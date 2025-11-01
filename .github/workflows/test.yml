@@ -70,8 +70,16 @@ jobs:
         run: |
           shopt -s globstar
           mkdir -p packages-staging/${{ matrix.name }}
-          find openwrt-sdk/bin/packages -type f \( -name "luci-app-igmpproxy*.ipk" -o -name "luci-i18n-igmpproxy*.ipk" -o -name "*.apk" \) \
-            -exec cp {} packages-staging/${{ matrix.name }}/ \;
+
+          # DEBUG: 列出所有可能的 igmpproxy 生成文件
+          echo "=== SDK 里可能的 igmpproxy 文件列表 ==="
+          find openwrt-sdk -type f -path '*/bin/packages/*' \( -iname '*igmpproxy*.ipk' -o -iname '*igmpproxy*.apk' -o -iname 'luci-i18n-igmpproxy*.ipk' \) -print || true
+
+          # 只复制 igmpproxy / luci-i18n-igmpproxy 文件
+          find openwrt-sdk -type f -path '*/bin/packages/*' \
+            \( -iname '*igmpproxy*.ipk' -o -iname '*igmpproxy*.apk' -o -iname 'luci-i18n-igmpproxy*.ipk' \) \
+            -exec cp -v {} packages-staging/${{ matrix.name }}/ \;
+
           echo "=== 暂存区文件 ==="
           ls -la packages-staging/${{ matrix.name }}/ || echo "⚠️ 无文件"
 
@@ -101,28 +109,20 @@ jobs:
           path: downloaded-packages
           merge-multiple: true
 
-      - name: Setup Git identity
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-      - name: Create version tag
-        run: |
-          TAG="v$(date +'%Y.%m.%d-%H%M')"
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          git tag $TAG
-          git push origin $TAG
-
       - name: Verify package files
         run: |
-          echo "=== 准备发布的文件列表 ==="
-          find downloaded-packages -type f \( -name "*.ipk" -o -name "*.apk" \) || exit 1
+          found=$(find downloaded-packages -type f \( -name "*igmpproxy*.ipk" -o -name "*igmpproxy*.apk" -o -name "luci-i18n-igmpproxy*.ipk" \) | wc -l)
+          if [ "$found" -eq 0 ]; then
+            echo "未找到任何 igmpproxy 包，停止发布。"
+            exit 1
+          fi
+          echo "Found $found package(s) to release."
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.TAG }}
-          name: "luci-app-igmpproxy Build ${{ env.TAG }}"
+          tag_name: v${{ github.run_number }}
+          name: "luci-app-igmpproxy Build v${{ github.run_number }}"
           body: |
             Multi-architecture build of luci-app-igmpproxy
             
