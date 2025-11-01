@@ -1,4 +1,5 @@
-name: Build luci-app-igmpproxy (multi-sdk: snapshot & 23.05)
+name: "Build luci-app-igmpproxy (multi-sdk: snapshot & 23.05)"
+
 
 on:
   workflow_dispatch:
