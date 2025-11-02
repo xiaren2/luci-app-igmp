@@ -2,7 +2,7 @@ local m, s, o
 local fs = require "nixio.fs"
 local uci = require "luci.model.uci".cursor()
 
--- ✅ 初始化网络与防火墙模型（非常关键）
+-- ✅ 初始化网络与防火墙模型（没卵用）
 local netm = require "luci.model.network".init()
 local fwm = require "luci.model.firewall".init()
 
@@ -28,7 +28,7 @@ if not uci:get_first("igmpproxy", "igmpproxy") then
     uci:commit("igmpproxy")
 end
 
-m = Map("igmpproxy", "IGMPPROXY设置", "配置IGMPPROXY以实现组播转发，igmpproxy仅支持ipv4。")
+m = Map("igmpproxy", "IGMPPROXY设置", "配置IGMPPROXY以实现组播转发，igmpproxy仅支持ipv4。by:xiaren2")
 
 -- 绑定网络、防火墙模型，让模板可以正常显示接口状态
 m.network = netm
