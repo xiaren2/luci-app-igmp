@@ -1,26 +1,41 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
-msgid "Add instance"
-msgstr ""
-
-msgid "Downlink interface"
-msgstr ""
-
-msgid "IGMP proxy configuration"
-msgstr ""
-
-msgid "Proxy Instance"
-msgstr ""
-
-msgid "Uplink interface"
-msgstr ""
-
-msgid "Where does the multicast come from?"
-msgstr ""
-
-msgid "Where does the multicast go to?"
-msgstr ""
-
 msgid "igmpproxy"
+msgstr ""
+
+msgid "IGMP Proxy Configuration"
+msgstr ""
+
+msgid "General Settings"
+msgstr ""
+
+msgid "Quick Leave"
+msgstr ""
+
+msgid "Enable quickleave mode"
+msgstr ""
+
+msgid "Verbose Level"
+msgstr ""
+
+msgid "0=none, 1=minimal, 2=more, 3=max"
+msgstr ""
+
+msgid "Physical Interfaces"
+msgstr ""
+
+msgid "Add Interface"
+msgstr ""
+
+msgid "Network Interface"
+msgstr ""
+
+msgid "Firewall Zone"
+msgstr ""
+
+msgid "Direction"
+msgstr ""
+
+msgid "Alternative Networks"
 msgstr ""
