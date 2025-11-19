@@ -1,0 +1,26 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+msgid "Add instance"
+msgstr ""
+
+msgid "Downlink interface"
+msgstr ""
+
+msgid "IGMP proxy configuration"
+msgstr ""
+
+msgid "Proxy Instance"
+msgstr ""
+
+msgid "Uplink interface"
+msgstr ""
+
+msgid "Where does the multicast come from?"
+msgstr ""
+
+msgid "Where does the multicast go to?"
+msgstr ""
+
+msgid "igmpproxy"
+msgstr ""
