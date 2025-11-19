@@ -1,4 +1,3 @@
--- Copyright
 module("luci.controller.igmpproxy", package.seeall)
 
 function index()
@@ -6,6 +5,5 @@ function index()
         return
     end
 
-    local page = entry({"admin", "services", "igmpproxy"}, view("igmpproxy/overview"), _("igmpproxy"))
-    page.dependent = true
+    entry({"admin", "services", "igmpproxy"}, view("igmpproxy/overview"), _("igmpproxy"), 20).dependent = true
 end
