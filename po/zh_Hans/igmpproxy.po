@@ -1,34 +1,68 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
-#: htdocs/luci-static/resources/view/igmpproxy/overview.js:10
-msgid "Add instance"
-msgstr "添加实例"
-
-#: htdocs/luci-static/resources/view/igmpproxy/overview.js:20
-msgid "Downlink interface"
-msgstr "下行链路接口"
-
-#: htdocs/luci-static/resources/view/igmpproxy/overview.js:5
-msgid "IGMP proxy configuration"
-msgstr "IGMP 代理配置"
-
-#: htdocs/luci-static/resources/view/igmpproxy/overview.js:12
-msgid "Proxy Instance"
-msgstr "代理实例"
-
-#: htdocs/luci-static/resources/view/igmpproxy/overview.js:15
-msgid "Uplink interface"
-msgstr "上行链路接口"
-
-#: htdocs/luci-static/resources/view/igmpproxy/overview.js:15
-msgid "Where does the multicast come from?"
-msgstr "组播数据来源"
-
-#: htdocs/luci-static/resources/view/igmpproxy/overview.js:20
-msgid "Where does the multicast go to?"
-msgstr "组播代理去向"
-
-#: luasrc/controller/igmpproxy.lua:10
 msgid "igmpproxy"
 msgstr "IGMP 代理"
+
+msgid "IGMP Proxy Configuration"
+msgstr "IGMP 代理配置"
+
+msgid "General Settings"
+msgstr "通用设置"
+
+msgid "Quick Leave"
+msgstr "快速离组"
+
+msgid "Enable quickleave mode"
+msgstr "启用快速离组模式"
+
+msgid "Verbose Level"
+msgstr "详细日志级别"
+
+msgid "0=none, 1=minimal, 2=more, 3=max"
+msgstr "0=无，1=最少，2=更多，3=最大"
+
+msgid "0 - None"
+msgstr "0 - 无"
+
+msgid "1 - Minimal"
+msgstr "1 - 最少"
+
+msgid "2 - More"
+msgstr "2 - 更多"
+
+msgid "3 - Maximum"
+msgstr "3 - 最大"
+
+msgid "Physical Interfaces"
+msgstr "物理接口"
+
+msgid "Add Interface"
+msgstr "添加接口"
+
+msgid "Network Interface"
+msgstr "网络接口"
+
+msgid "Select the network interface to use."
+msgstr "选择网络接口。"
+
+msgid "Firewall Zone"
+msgstr "防火墙区域"
+
+msgid "Direction"
+msgstr "方向"
+
+msgid "Upstream"
+msgstr "上行链路"
+
+msgid "Downstream"
+msgstr "下行链路"
+
+msgid "Disabled"
+msgstr "禁用"
+
+msgid "Alternative Networks"
+msgstr "附加允许网络"
+
+msgid "Define additional networks allowed to join multicast."
+msgstr "允许加入组播的额外网段。"
