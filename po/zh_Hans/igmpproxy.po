@@ -1,0 +1,34 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+#: htdocs/luci-static/resources/view/igmpproxy/overview.js:10
+msgid "Add instance"
+msgstr "添加实例"
+
+#: htdocs/luci-static/resources/view/igmpproxy/overview.js:20
+msgid "Downlink interface"
+msgstr "下行链路接口"
+
+#: htdocs/luci-static/resources/view/igmpproxy/overview.js:5
+msgid "IGMP proxy configuration"
+msgstr "IGMP 代理配置"
+
+#: htdocs/luci-static/resources/view/igmpproxy/overview.js:12
+msgid "Proxy Instance"
+msgstr "代理实例"
+
+#: htdocs/luci-static/resources/view/igmpproxy/overview.js:15
+msgid "Uplink interface"
+msgstr "上行链路接口"
+
+#: htdocs/luci-static/resources/view/igmpproxy/overview.js:15
+msgid "Where does the multicast come from?"
+msgstr "组播数据来源"
+
+#: htdocs/luci-static/resources/view/igmpproxy/overview.js:20
+msgid "Where does the multicast go to?"
+msgstr "组播代理去向"
+
+#: luasrc/controller/igmpproxy.lua:10
+msgid "igmpproxy"
+msgstr "IGMP 代理"
