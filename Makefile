@@ -1,5 +1,3 @@
-# luci-app-igmpproxy Makefile
-
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-igmpproxy
@@ -15,5 +13,4 @@ LUCI_PKGARCH:=all
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
-# OpenWrt buildroot
 # call BuildPackage
