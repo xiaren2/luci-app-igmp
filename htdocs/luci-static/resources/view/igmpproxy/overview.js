@@ -85,7 +85,14 @@ return L.view.extend({
         s.anonymous = false;
         s.addremove = true;
         s.description = _('Configure physical interfaces for multicast routing.');
-
+        
+        /* Direction */
+        o = s.option(form.ListValue, 'direction', _('Direction'));
+        o.value('upstream', _('Upstream (toward source)'));
+        o.value('downstream', _('Downstream (toward receivers)'));
+        o.value('disabled', _('Disabled'));
+        o.default = 'downstream';
+        
         /* Network interface */
         o = s.option(widgets.DeviceSelect, 'network', _('Network Interface'));
         o.nocreate = false;
@@ -113,13 +120,7 @@ return L.view.extend({
                 value = value.replace(/^@/, '');
             return uci.set('igmpproxy', section_id, 'zone', value);
         };
-
-        /* Direction */
-        o = s.option(form.ListValue, 'direction', _('Direction'));
-        o.value('upstream', _('Upstream (toward source)'));
-        o.value('downstream', _('Downstream (toward receivers)'));
-        o.value('disabled', _('Disabled'));
-        o.default = 'downstream';
+        
 
         /* Alternative networks */
         o = s.option(form.DynamicList, 'altnet', _('Alternative Networks'));
