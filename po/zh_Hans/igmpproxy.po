@@ -35,7 +35,7 @@ msgid "1 - Minimal"
 msgstr "1 - 最少"
 
 msgid "2 - More"
-msgstr "2 - 更多"
+msgstr "2 - 适中"
 
 msgid "3 - Maximum"
 msgstr "3 - 最大"
@@ -43,8 +43,8 @@ msgstr "3 - 最大"
 msgid "Physical Interfaces"
 msgstr "物理接口"
 
-msgid "Configure physical interfaces for multicast routing."
-msgstr "配置用于组播路由的物理接口。"
+msgid "Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback""
+msgstr "配置用于组播路由的物理接口,“禁用”适用于“lo”或者“loopback""
 
 msgid "Add Interface"
 msgstr "添加接口"
@@ -79,8 +79,8 @@ msgstr "附加网络"
 msgid "Additional networks considered as directly connected"
 msgstr "被视为直连的附加网络"
 
-msgid "Placeholder: 192.168.1.0/24"
-msgstr "占位示例: 192.168.1.0/24"
+msgid "Placeholder: 10.0.0.0/8"
+msgstr "占位示例: 10.0.0.0/8"
 
 msgid "Define additional networks allowed to join multicast."
 msgstr "定义允许加入组播的附加网络。"
