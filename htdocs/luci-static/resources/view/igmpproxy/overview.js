@@ -10,7 +10,8 @@ return L.view.extend({
             .then(() => uci.load('igmpproxy'))
             .catch(() => this.createDefaultConfig())
             .then(() => this.ensureIgmpProxySection())
-            .then(() => uci.load('firewall'));
+            .then(() => uci.load('firewall'))
+            .then(() => uci.load('network')); // 加载 network，供 cfgvalue 检查使用
     },
 
     createDefaultConfig: function() {
@@ -80,10 +81,39 @@ return L.view.extend({
         o.optional = false;
         o.unspecified = true;
         o.rmempty = true;
-        o.write = function(section_id, value) {
-            if (value) value = value.replace(/^@/, '');
-            return uci.set('igmpproxy', section_id, 'network', value);
+ /**
+         * cfgvalue: 从 UCI 读取的值 => 返回给 DeviceSelect 的显示值
+         *
+         * 逻辑：
+         *  - 如果 v 是空，返回 v（空）
+         *  - 如果 /etc/config/network 中存在 type 为 'interface' 且名字为 v 的 section（即 logical interface），
+         *      则返回 '@' + v，让 DeviceSelect 在 UI 上以别名形式显示（@lan）
+         *  - 否则直接返回 v（物理设备名或其他字符串），避免错误地加上 @
+         */
+        o.cfgvalue = function(section_id) {
+            var v = uci.get('igmpproxy', section_id, 'network');
+            if (!v) return v;
+
+            // 遍历 network 配置，查找是否存在名字为 v 的 interface section
+            var netSections = uci.sections('network') || [];
+            for (var i = 0; i < netSections.length; i++) {
+                var ns = netSections[i];
+                if (ns['.name'] === v && ns['.type'] === 'interface') {
+                    // 只有当它确实是 network 的 interface section 时才加 @
+                    return '@' + v;
+                }
+            }
+
+            // 否则不要加 @（保持物理设备名或原始值）
+            return v;
         };
+
+        // 保存时：如果前端传回 @xxx，去掉 @ 并写入真实名字（UCI 不应包含 @）
+        o.write = function(section_id, value) {
+            if (value && value.startsWith('@'))
+                value = value.slice(1);
+            return uci.set('igmpproxy', section_id, 'network', value);
+        };  
 
         o = s.option(widgets.ZoneSelect, 'zone', _('Firewall Zone'));
         o.nocreate = false;
@@ -91,10 +121,6 @@ return L.view.extend({
         o.optional = true;
         o.unspecified = true;
         o.rmempty = true;
-        o.write = function(section_id, value) {
-            if (value) value = value.replace(/^@/, '');
-            return uci.set('igmpproxy', section_id, 'zone', value);
-        };
 
         o = s.option(form.DynamicList, 'altnet', _('Alternative Networks'));
         o.placeholder = '10.0.0.0/8';
