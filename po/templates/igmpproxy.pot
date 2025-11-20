@@ -84,3 +84,6 @@ msgstr ""
 
 msgid "Define additional networks allowed to join multicast."
 msgstr ""
+
+msgid "IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2"
+msgstr ""
