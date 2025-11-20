@@ -2,13 +2,13 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
 msgid "igmpproxy"
-msgstr "IGMP 代理"
+msgstr "IGMPPROXY设置"
 
 msgid "IGMP Proxy"
-msgstr "IGMP 代理"
+msgstr "IGMPPROXY设置"
 
 msgid "IGMP Proxy Configuration"
-msgstr "IGMP 代理配置"
+msgstr "IGMPPROXY配置"
 
 msgid "General Settings"
 msgstr "通用设置"
@@ -65,10 +65,10 @@ msgid "Direction"
 msgstr "方向"
 
 msgid "Upstream (toward source)"
-msgstr "上行（朝向源）"
+msgstr "上行（组播来源方向）"
 
 msgid "Downstream (toward receivers)"
-msgstr "下行（朝向接收端）"
+msgstr "下行（组播接收方向）"
 
 msgid "Disabled"
 msgstr "禁用"
