@@ -67,7 +67,7 @@ return L.view.extend({
         s = m.section(form.GridSection, 'phyint', _('Physical Interfaces'));
         s.anonymous = false;
         s.addremove = true;
-        s.description = _('Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback"');
+        s.description = _('Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback" interface');
 
         o = s.option(form.ListValue, 'direction', _('Direction'));
         o.value('upstream', _('Upstream (toward source)'));
