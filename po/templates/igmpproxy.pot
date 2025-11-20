@@ -43,7 +43,7 @@ msgstr ""
 msgid "Physical Interfaces"
 msgstr ""
 
-msgid "Configure physical interfaces for multicast routing."
+msgid "Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback""
 msgstr ""
 
 msgid "Add Interface"
@@ -79,7 +79,7 @@ msgstr ""
 msgid "Additional networks considered as directly connected"
 msgstr ""
 
-msgid "Placeholder: 192.168.1.0/24"
+msgid "Placeholder: 10.0.0.0/8"
 msgstr ""
 
 msgid "Define additional networks allowed to join multicast."
