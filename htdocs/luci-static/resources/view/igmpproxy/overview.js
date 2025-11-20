@@ -7,35 +7,51 @@
 return L.view.extend({
     load: function() {
         return fs.stat('/etc/config/igmpproxy').then(() => {
-            // 文件存在，正常加载
             return uci.load('igmpproxy');
         }).catch((err) => {
-            // 文件不存在，创建默认配置
             return this.createDefaultConfig();
         }).then(() => {
-            // 同时加载 firewall 配置
+            return this.ensureIgmpProxySection();
+        }).then(() => {
             return uci.load('firewall');
         });
     },
 
     createDefaultConfig: function() {
-        // 创建包含默认配置的初始文件
+        // 直接创建包含完整配置的文件
         var defaultConfig = [
             "config igmpproxy",
-            "\toption quickleave '1'",
+            "\toption quickleave '1'", 
             "\toption verbose '1'",
             ""
         ].join('\n');
 
         return fs.write('/etc/config/igmpproxy', defaultConfig)
-            .then(() => {
-                // 重新加载配置
-                return uci.load('igmpproxy');
-            })
+            .then(() => uci.load('igmpproxy'))
             .catch((err) => {
-                console.error('Failed to create default igmpproxy config:', err);
+                console.error('Failed to create igmpproxy config:', err);
                 throw err;
             });
+    },
+
+    ensureIgmpProxySection: function() {
+        var sections = uci.sections('igmpproxy', 'igmpproxy');
+        
+        if (sections.length === 0) {
+            var sid = uci.add('igmpproxy', 'igmpproxy');
+            uci.set('igmpproxy', sid, 'quickleave', '1');
+            uci.set('igmpproxy', sid, 'verbose', '1');
+            return uci.save().then(() => uci.apply());
+        } else {
+            // 确保现有 section 有 quickleave 选项
+            var section = sections[0];
+            if (!section.quickleave) {
+                uci.set('igmpproxy', section['.name'], 'quickleave', '1');
+                return uci.save().then(() => uci.apply());
+            }
+        }
+        
+        return Promise.resolve();
     },
 
     render: function() {
@@ -44,9 +60,13 @@ return L.view.extend({
         m = new form.Map('igmpproxy', _('IGMP Proxy'),
             _('IGMP Proxy allows multicast traffic to be properly forwarded between networks.'));
 
-        /* General settings */
-        s = m.section(form.TypedSection, 'igmpproxy', _('General Settings'));
-        s.anonymous = true;
+        /* General settings - 使用第一个找到的 igmpproxy section */
+        var igmpSections = uci.sections('igmpproxy', 'igmpproxy');
+        var firstSection = igmpSections.length > 0 ? igmpSections[0]['.name'] : 'config';
+        
+        s = m.section(form.NamedSection, firstSection, 'igmpproxy', _('General Settings'));
+        s.anonymous = false;
+        s.addremove = false;
 
         o = s.option(form.Flag, 'quickleave', _('Quick Leave'));
         o.description = _('Send leave messages immediately on departure of the last member.');
@@ -59,6 +79,7 @@ return L.view.extend({
         o.value('3', _('3 - Maximum'));
         o.default = '1';
 
+        // 其余代码保持不变...
         /* Physical interfaces */
         s = m.section(form.TypedSection, 'phyint', _('Physical Interfaces'));
         s.anonymous = false;
@@ -72,7 +93,6 @@ return L.view.extend({
         o.unspecified = true;
         o.rmempty = true;
 
-        /* 删除 @ */
         o.write = function(section_id, value) {
             if (value)
                 value = value.replace(/^@/, '');
@@ -88,7 +108,6 @@ return L.view.extend({
         o.rmempty = true;
         o.description = _('Assign this interface to a firewall zone');
 
-        /* 删除 @ */
         o.write = function(section_id, value) {
             if (value)
                 value = value.replace(/^@/, '');
