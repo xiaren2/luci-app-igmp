@@ -1,7 +1,10 @@
 msgid ""
-msgstr "Content-Type: text/plain; charset=UTF-8"
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
 msgid "igmpproxy"
+msgstr ""
+
+msgid "IGMP Proxy"
 msgstr ""
 
 msgid "IGMP Proxy Configuration"
@@ -13,6 +16,9 @@ msgstr ""
 msgid "Quick Leave"
 msgstr ""
 
+msgid "Send leave messages immediately on departure of the last member."
+msgstr ""
+
 msgid "Enable quickleave mode"
 msgstr ""
 
@@ -22,7 +28,22 @@ msgstr ""
 msgid "0=none, 1=minimal, 2=more, 3=max"
 msgstr ""
 
+msgid "0 - None"
+msgstr ""
+
+msgid "1 - Minimal"
+msgstr ""
+
+msgid "2 - More"
+msgstr ""
+
+msgid "3 - Maximum"
+msgstr ""
+
 msgid "Physical Interfaces"
+msgstr ""
+
+msgid "Configure physical interfaces for multicast routing."
 msgstr ""
 
 msgid "Add Interface"
@@ -31,11 +52,35 @@ msgstr ""
 msgid "Network Interface"
 msgstr ""
 
+msgid "Select the network interface to use."
+msgstr ""
+
 msgid "Firewall Zone"
+msgstr ""
+
+msgid "Assign this interface to a firewall zone"
 msgstr ""
 
 msgid "Direction"
 msgstr ""
 
+msgid "Upstream (toward source)"
+msgstr ""
+
+msgid "Downstream (toward receivers)"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
 msgid "Alternative Networks"
+msgstr ""
+
+msgid "Additional networks considered as directly connected"
+msgstr ""
+
+msgid "Placeholder: 192.168.1.0/24"
+msgstr ""
+
+msgid "Define additional networks allowed to join multicast."
 msgstr ""
