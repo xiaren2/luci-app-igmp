@@ -43,7 +43,7 @@ return L.view.extend({
 
     render: function() {
         var m = new form.Map('igmpproxy', _('IGMP Proxy'),
-            _('IGMP Proxy allows multicast traffic to be properly forwarded between networks.'));
+            _('IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2'));
 
         // ===== General Settings (垂直布局) =====
         var igmpSections = uci.sections('igmpproxy', 'igmpproxy');
@@ -67,7 +67,7 @@ return L.view.extend({
         s = m.section(form.GridSection, 'phyint', _('Physical Interfaces'));
         s.anonymous = false;
         s.addremove = true;
-        s.description = _('Configure physical interfaces for multicast routing.');
+        s.description = _('Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback"');
 
         o = s.option(form.ListValue, 'direction', _('Direction'));
         o.value('upstream', _('Upstream (toward source)'));
