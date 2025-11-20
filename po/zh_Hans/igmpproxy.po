@@ -17,7 +17,7 @@ msgid "Quick Leave"
 msgstr "快速离组"
 
 msgid "Send leave messages immediately on departure of the last member."
-msgstr "在成员离开时立即发送离开消息,可能会造成其他用户卡顿。"
+msgstr "在成员离开时立即发送离开消息,可能会造成其他用户卡顿几秒。"
 
 msgid "Enable quickleave mode"
 msgstr "启用快速离组模式"
