@@ -26,7 +26,7 @@ msgid "Verbose Level"
 msgstr "详细日志级别"
 
 msgid "0=none, 1=minimal, 2=more, 3=max"
-msgstr "0=无，1=最少，2=更多，3=最大"
+msgstr "0=无，1=最少，2=适中，3=最大"
 
 msgid "0 - None"
 msgstr "0 - 无"
@@ -44,7 +44,7 @@ msgid "Physical Interfaces"
 msgstr "物理接口"
 
 msgid "Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback" interface"
-msgstr "配置用于组播路由的物理接口,“禁用”适用于lo或者loopback接口"
+msgstr "配置用于组播路由的物理接口,“禁用”适用于lo或者loopback接口，自行创建"
 
 msgid "Add Interface"
 msgstr "添加接口"
