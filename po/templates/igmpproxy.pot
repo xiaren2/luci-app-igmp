@@ -49,18 +49,6 @@ msgstr ""
 msgid "Add Interface"
 msgstr ""
 
-msgid "Network Interface"
-msgstr ""
-
-msgid "Select the network interface to use."
-msgstr ""
-
-msgid "Firewall Zone"
-msgstr ""
-
-msgid "Assign this interface to a firewall zone"
-msgstr ""
-
 msgid "Direction"
 msgstr ""
 
@@ -71,6 +59,18 @@ msgid "Downstream (toward receivers)"
 msgstr ""
 
 msgid "Disabled"
+msgstr ""
+
+msgid "Network Interface"
+msgstr ""
+
+msgid "Select the network interface to use."
+msgstr ""
+
+msgid "Firewall Zone"
+msgstr ""
+
+msgid "Assign this interface to a firewall zone"
 msgstr ""
 
 msgid "Alternative Networks"
