@@ -49,18 +49,6 @@ msgstr "配置用于组播路由的物理接口。"
 msgid "Add Interface"
 msgstr "添加接口"
 
-msgid "Network Interface"
-msgstr "网络接口"
-
-msgid "Select the network interface to use."
-msgstr "选择要使用的网络接口。"
-
-msgid "Firewall Zone"
-msgstr "防火墙区域"
-
-msgid "Assign this interface to a firewall zone"
-msgstr "将该接口分配到防火墙区域"
-
 msgid "Direction"
 msgstr "方向"
 
@@ -72,6 +60,18 @@ msgstr "下行（组播接收方向）"
 
 msgid "Disabled"
 msgstr "禁用"
+
+msgid "Network Interface"
+msgstr "网络接口"
+
+msgid "Select the network interface to use."
+msgstr "选择要使用的网络接口。"
+
+msgid "Firewall Zone"
+msgstr "防火墙区域"
+
+msgid "Assign this interface to a firewall zone"
+msgstr "将该接口分配到防火墙区域"
 
 msgid "Alternative Networks"
 msgstr "附加网络"
