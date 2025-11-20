@@ -43,7 +43,7 @@ msgstr ""
 msgid "Physical Interfaces"
 msgstr ""
 
-msgid "Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback""
+msgid "Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback" interface"
 msgstr ""
 
 msgid "Add Interface"
