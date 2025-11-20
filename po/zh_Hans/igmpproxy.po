@@ -4,6 +4,9 @@ msgstr "Content-Type: text/plain; charset=UTF-8\n"
 msgid "igmpproxy"
 msgstr "IGMP 代理"
 
+msgid "IGMP Proxy"
+msgstr "IGMP 代理"
+
 msgid "IGMP Proxy Configuration"
 msgstr "IGMP 代理配置"
 
@@ -12,6 +15,9 @@ msgstr "通用设置"
 
 msgid "Quick Leave"
 msgstr "快速离组"
+
+msgid "Send leave messages immediately on departure of the last member."
+msgstr "在最后一个成员离开时立即发送离开消息。"
 
 msgid "Enable quickleave mode"
 msgstr "启用快速离组模式"
@@ -37,6 +43,9 @@ msgstr "3 - 最大"
 msgid "Physical Interfaces"
 msgstr "物理接口"
 
+msgid "Configure physical interfaces for multicast routing."
+msgstr "配置用于组播路由的物理接口。"
+
 msgid "Add Interface"
 msgstr "添加接口"
 
@@ -44,25 +53,34 @@ msgid "Network Interface"
 msgstr "网络接口"
 
 msgid "Select the network interface to use."
-msgstr "选择网络接口。"
+msgstr "选择要使用的网络接口。"
 
 msgid "Firewall Zone"
 msgstr "防火墙区域"
 
+msgid "Assign this interface to a firewall zone"
+msgstr "将该接口分配到防火墙区域"
+
 msgid "Direction"
 msgstr "方向"
 
-msgid "Upstream"
-msgstr "上行链路"
+msgid "Upstream (toward source)"
+msgstr "上行（朝向源）"
 
-msgid "Downstream"
-msgstr "下行链路"
+msgid "Downstream (toward receivers)"
+msgstr "下行（朝向接收端）"
 
 msgid "Disabled"
 msgstr "禁用"
 
 msgid "Alternative Networks"
-msgstr "附加允许网络"
+msgstr "附加网络"
+
+msgid "Additional networks considered as directly connected"
+msgstr "被视为直连的附加网络"
+
+msgid "Placeholder: 192.168.1.0/24"
+msgstr "占位示例: 192.168.1.0/24"
 
 msgid "Define additional networks allowed to join multicast."
-msgstr "允许加入组播的额外网段。"
+msgstr "定义允许加入组播的附加网络。"
