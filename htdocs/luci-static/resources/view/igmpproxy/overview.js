@@ -97,7 +97,7 @@ return L.view.extend({
         };
 
         o = s.option(form.DynamicList, 'altnet', _('Alternative Networks'));
-        o.placeholder = '192.168.1.0/24';
+        o.placeholder = '10.0.0.0/8';
         o.datatype = 'list(cidr)';
 
         return m.render();
