@@ -82,3 +82,16 @@ jobs:
           path: packages-staging/${{ matrix.name }}/
           retention-days: 3
           if-no-files-found: warn
+ # --------------------------------------------------------
+      # 🔥 新增：上传构建结果到 GitHub Release
+      # --------------------------------------------------------
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "multi-arch-build"
+          name: "Multi-Arch Build"
+          draft: false
+          prerelease: false
+          files: packages-staging/${{ matrix.name }}/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
