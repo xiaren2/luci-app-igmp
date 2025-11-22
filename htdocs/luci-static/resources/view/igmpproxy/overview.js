@@ -63,7 +63,8 @@ return L.view.extend({
         o.value('2', _('2 - More'));
         o.value('3', _('3 - Maximum'));
         o.default = '1';
-
+        o.description = _('0=none, 1=minimal, 2=more, 3=max');
+        
         // ===== Physical Interfaces (表格) =====
         s = m.section(form.GridSection, 'phyint', _('Physical Interfaces'));
         s.anonymous = false;
@@ -75,12 +76,14 @@ return L.view.extend({
         o.value('downstream', _('Downstream (toward receivers)'));
         o.value('disabled', _('Disabled'));
         o.default = 'downstream';
-
+        o.description = _('Select the multicast routing direction');
+        
         o = s.option(widgets.DeviceSelect, 'network', _('Network Interface'));
         o.nocreate = false;
         o.optional = false;
         o.unspecified = true;
         o.rmempty = true;
+        o.description = _('Select the network interface to use.');
  /**
          * cfgvalue: 从 UCI 读取的值 => 返回给 DeviceSelect 的显示值
          *
@@ -121,11 +124,12 @@ return L.view.extend({
         o.optional = true;
         o.unspecified = true;
         o.rmempty = true;
-
+        o.description = _('Assign this interface to a firewall zone');
+        
         o = s.option(form.DynamicList, 'altnet', _('Alternative Networks'));
         o.placeholder = '10.0.0.0/8';
         o.datatype = 'list(cidr)';
-
+        o.description = _('Define additional networks allowed to join multicast.');
         return m.render();
     }
 });
