@@ -52,6 +52,9 @@ msgstr "添加接口"
 msgid "Direction"
 msgstr "方向"
 
+msgid "Select the multicast routing direction"
+msgstr "选择组播的方向"
+
 msgid "Upstream (toward source)"
 msgstr "上行（组播来源方向）"
 
@@ -65,7 +68,7 @@ msgid "Network Interface"
 msgstr "网络接口"
 
 msgid "Select the network interface to use."
-msgstr "选择要使用的网络接口。"
+msgstr "选择要使用的网络接口，别名优先。"
 
 msgid "Firewall Zone"
 msgstr "防火墙区域"
