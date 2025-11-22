@@ -2,7 +2,7 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
 msgid "igmpproxy"
-msgstr "IGMPPROXY设置"
+msgstr "igmpproxy"
 
 msgid "IGMP Proxy"
 msgstr "IGMPPROXY设置"
