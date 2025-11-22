@@ -53,7 +53,7 @@ msgid "Direction"
 msgstr "方向"
 
 msgid "Select the multicast routing direction"
-msgstr "组播路由的方向"
+msgstr "选择组播路由的方向"
 
 msgid "Upstream (toward source)"
 msgstr "上行（组播来源方向）"
