@@ -50,7 +50,7 @@ msgid "Add Interface"
 msgstr "添加接口"
 
 msgid "Direction"
-msgstr "方向"
+msgstr "组播方向"
 
 msgid "Select the multicast routing direction"
 msgstr "选择组播路由的方向或禁用方向"
