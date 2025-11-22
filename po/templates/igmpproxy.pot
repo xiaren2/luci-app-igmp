@@ -52,6 +52,9 @@ msgstr ""
 msgid "Direction"
 msgstr ""
 
+msgid "Select the multicast routing direction"
+msgstr ""
+
 msgid "Upstream (toward source)"
 msgstr ""
 
