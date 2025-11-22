@@ -17,13 +17,13 @@ msgid "Quick Leave"
 msgstr "快速离开"
 
 msgid "Send leave messages immediately on departure of the last member."
-msgstr "在一位成员离开时立即发送离开消息,可能会造成其他用户卡顿几秒"
+msgstr "在一位成员离开时立即发送离开消息,可能会造成其他成员卡顿几秒"
 
 msgid "Enable quickleave mode"
 msgstr "启用快速离开模式"
 
 msgid "Verbose Level"
-msgstr "详细日志级别"
+msgstr "日志详细级别"
 
 msgid "0=none, 1=minimal, 2=more, 3=max"
 msgstr "0=无，1=最少，2=适中，3=最大"
@@ -44,7 +44,7 @@ msgid "Physical Interfaces"
 msgstr "接口设置"
 
 msgid "Configure physical interfaces for multicast routing.\"Disabled\" is applicable to \"lo\" or \"loopback\" interface"
-msgstr "配置用于组播路由的接口，“禁用”适用于lo或者loopback接口，接口不存在可自行创建"
+msgstr "配置用于组播路由的接口，“禁用”适用于lo或者loopback接口，接口不存在可自行创建。如果保存后/etc/igmpproxy.conf无法生成对应行说明配置错误。主要是接口错误，应该优先选择别名。"
 
 msgid "Add Interface"
 msgstr "添加接口"
