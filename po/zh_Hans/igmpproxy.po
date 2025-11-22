@@ -14,13 +14,13 @@ msgid "General Settings"
 msgstr "通用设置"
 
 msgid "Quick Leave"
-msgstr "快速离组"
+msgstr "快速离开"
 
 msgid "Send leave messages immediately on departure of the last member."
-msgstr "在成员离开时立即发送离开消息,可能会造成其他用户卡顿几秒。"
+msgstr "在一位成员离开时立即发送离开消息,可能会造成其他用户卡顿几秒。"
 
 msgid "Enable quickleave mode"
-msgstr "启用快速离组模式"
+msgstr "启用快速离开模式"
 
 msgid "Verbose Level"
 msgstr "详细日志级别"
@@ -41,10 +41,10 @@ msgid "3 - Maximum"
 msgstr "3 - 最大"
 
 msgid "Physical Interfaces"
-msgstr "物理接口"
+msgstr "接口设置"
 
 msgid "Configure physical interfaces for multicast routing.\"Disabled\" is applicable to \"lo\" or \"loopback\" interface"
-msgstr "配置用于组播路由的物理接口,“禁用”适用于lo或者loopback接口，自行创建"
+msgstr "配置用于组播路由的接口,“禁用”适用于lo或者loopback接口，下拉不存在可自行创建"
 
 msgid "Add Interface"
 msgstr "添加接口"
@@ -71,7 +71,7 @@ msgid "Firewall Zone"
 msgstr "防火墙区域"
 
 msgid "Assign this interface to a firewall zone"
-msgstr "将该接口分配到防火墙区域"
+msgstr "将该接口分配到防火墙区域，自行测试是否需要加入防火墙"
 
 msgid "Alternative Networks"
 msgstr "附加网络"
@@ -83,7 +83,7 @@ msgid "Placeholder: 10.0.0.0/8"
 msgstr "占位示例: 10.0.0.0/8"
 
 msgid "Define additional networks allowed to join multicast."
-msgstr "定义允许加入组播的附加网络。"
+msgstr "定义允许加入组播的附加网络，观察日志文件决定上行可直连的网络。下行放行可默认不填，一般是接收设备ip段。"
 
 msgid "IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2"
 msgstr "IGMPPROXY允许在网络间正确转发组播流量,仅支持ipv4，igmpproxy支持一个上行，多个下行。by:github.com/xiaren2"
