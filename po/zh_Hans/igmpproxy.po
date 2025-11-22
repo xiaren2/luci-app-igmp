@@ -68,7 +68,7 @@ msgid "Network Interface"
 msgstr "网络接口"
 
 msgid "Select the network interface to use."
-msgstr "选择要使用的网络接口，别名优先。/etc/igmpproxy.conf无法生成所在行说明输入接口错误。"
+msgstr "选择要使用的网络接口，别名优先。/etc/igmpproxy.conf无法生成对应行说明输入接口错误。"
 
 msgid "Firewall Zone"
 msgstr "防火墙区域"
