@@ -17,7 +17,7 @@ msgid "Quick Leave"
 msgstr "快速离开"
 
 msgid "Send leave messages immediately on departure of the last member."
-msgstr "在一位成员离开时立即发送离开消息,可能会造成其他用户卡顿几秒。"
+msgstr "在一位成员离开时立即发送离开消息,可能会造成其他用户卡顿几秒"
 
 msgid "Enable quickleave mode"
 msgstr "启用快速离开模式"
@@ -68,7 +68,7 @@ msgid "Network Interface"
 msgstr "网络接口"
 
 msgid "Select the network interface to use."
-msgstr "选择要使用的网络接口，别名优先。/etc/igmpproxy.conf无法生成对应行说明输入接口错误。"
+msgstr "选择要使用的网络接口，别名优先。/etc/igmpproxy.conf无法生成对应行说明输入接口错误"
 
 msgid "Firewall Zone"
 msgstr "防火墙区域"
@@ -86,7 +86,7 @@ msgid "Placeholder: 10.0.0.0/8"
 msgstr "占位示例: 10.0.0.0/8"
 
 msgid "Define additional networks allowed to join multicast."
-msgstr "定义允许加入组播的附加网络，观察日志文件决定上行可直连的网络。下行放行可默认不填，一般是接收设备ip段。"
+msgstr "定义允许加入组播的附加网络，观察日志文件决定上行可直连的网络。下行放行可默认不填，一般是接收设备ip段"
 
 msgid "IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2"
 msgstr "IGMPPROXY允许在网络间正确转发组播流量，仅支持ipv4，igmpproxy支持一个上行，多个下行。by:github.com/xiaren2"
