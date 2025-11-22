@@ -86,4 +86,4 @@ msgid "Define additional networks allowed to join multicast."
 msgstr "定义允许加入组播的附加网络，观察日志文件决定上行可直连的网络。下行放行可默认不填，一般是接收设备ip段。"
 
 msgid "IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2"
-msgstr "IGMPPROXY允许在网络间正确转发组播流量,仅支持ipv4，igmpproxy支持一个上行，多个下行。by:github.com/xiaren2"
+msgstr "IGMPPROXY允许在网络间正确转发组播流量，仅支持ipv4，igmpproxy支持一个上行，多个下行。by:github.com/xiaren2"
