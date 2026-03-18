@@ -116,7 +116,7 @@ msgid "Scanning logs..."
 msgstr "正在扫描日志..."
 
 msgid "No alternative network addresses found."
-msgstr "未找到附加网络地址"
+msgstr "未找到附加网络地址,先把上下行网络防火墙配置好，播放一次rtp:// 后，再尝试。"
 
 msgid "No data"
 msgstr "暂无数据"
@@ -128,7 +128,7 @@ msgid "Added"
 msgstr "已添加"
 
 msgid "No upstream"
-msgstr "请先新建组播上行方向"
+msgstr "请先新建组播上行后再添加"
 
 msgid "Exists"
 msgstr "已存在"
