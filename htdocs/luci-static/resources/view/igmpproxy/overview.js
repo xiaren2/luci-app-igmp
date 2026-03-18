@@ -88,6 +88,17 @@ return L.view.extend({
         });
     },
 
+    // 新增：将IP地址转换为/24子网的函数
+    ipToCidr24: function(ip) {
+        // 验证IP地址格式
+        let ipParts = ip.split('.');
+        if (ipParts.length !== 4) return null;
+        
+        // 提取前三段作为子网
+        let subnet = ipParts[0] + '.' + ipParts[1] + '.' + ipParts[2] + '.0';
+        return subnet + '/24';
+    },
+
     render: function() {
         var m = new form.Map('igmpproxy', _('IGMP Proxy'),
             _('IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2'));
@@ -151,7 +162,13 @@ return L.view.extend({
                     altResult.querySelectorAll('button').forEach(btn => {
                         btn.addEventListener('click', () => {
                             let ip = btn.getAttribute('data-ip');
-                            let cidr = ip + '/32';
+                            // 修改此处：将/32改为/24
+                            let cidr = this.ipToCidr24(ip);
+                            
+                            if (!cidr) {
+                                btn.innerText = _('Invalid IP');
+                                return;
+                            }
 
                             let sections = uci.sections('igmpproxy', 'phyint');
 
