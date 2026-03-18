@@ -113,10 +113,10 @@ return L.view.extend({
         o.description = _('Send leave messages immediately on departure of the last member.');
 
         o = s.option(form.ListValue, 'verbose', _('Verbose Level'));
-        o.value('0', _('0 - None'));
-        o.value('1', _('1 - Minimal'));
-        o.value('2', _('2 - More'));
-        o.value('3', _('3 - Maximum'));
+        o.value('0', _('0'));
+        o.value('1', _('1'));
+        o.value('2', _('2'));
+        o.value('3', _('3'));
         o.default = '1';
         o.description = _('0=none, 1=minimal, 2=more, 3=max');
 
