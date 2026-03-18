@@ -1,4 +1,5 @@
 'use strict';
+
 'require form';
 'require tools.widgets as widgets';
 'require uci';
@@ -47,7 +48,6 @@ return L.view.extend({
         return fs.exec('/etc/init.d/igmpproxy', [action]);
     },
 
-    // ===== 日志解析 =====
     findAltNetworks: function() {
         return fs.exec('/sbin/logread', ['-e', 'igmpproxy']).then(res => {
             if (res.code !== 0)
@@ -88,44 +88,43 @@ return L.view.extend({
         });
     },
 
-    // 新增：将IP地址转换为/24子网的函数
     ipToCidr24: function(ip) {
-        // 验证IP地址格式
         let ipParts = ip.split('.');
         if (ipParts.length !== 4) return null;
-        
-        // 提取前三段作为子网
+
         let subnet = ipParts[0] + '.' + ipParts[1] + '.' + ipParts[2] + '.0';
         return subnet + '/24';
     },
 
     render: function() {
+
         var m = new form.Map('igmpproxy', _('IGMP Proxy'),
             _('IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2'));
 
         // ===== 状态栏 =====
-        var statusText = E('span', { 'id': 'igmpproxy_status' }, _('Checking status...'));
+        var statusText = E('span', {}, _('Checking status...'));
 
         var btnStart = E('button', {
             'class': 'btn cbi-button cbi-button-apply',
-            'click': L.bind(() => this.handleService('start'), this)
+            'click': () => this.handleService('start').then(() =>
+                this.updateStatus(statusText, btnStart, btnStop, btnRestart))
         }, _('Start'));
 
         var btnStop = E('button', {
             'class': 'btn cbi-button cbi-button-reset',
-            'click': L.bind(() => this.handleService('stop'), this)
+            'click': () => this.handleService('stop').then(() =>
+                this.updateStatus(statusText, btnStart, btnStop, btnRestart))
         }, _('Stop'));
 
         var btnRestart = E('button', {
             'class': 'btn cbi-button',
-            'click': L.bind(() => this.handleService('restart'), this)
+            'click': () => this.handleService('restart').then(() =>
+                this.updateStatus(statusText, btnStart, btnStop, btnRestart))
         }, _('Restart'));
 
         var btnRefresh = E('button', {
             'class': 'btn cbi-button',
-            'click': function() {
-                window.location.reload(true);
-            }
+            'click': () => window.location.reload(true)
         }, _('Refresh'));
 
         var statusBar = E('div', { 'class': 'cbi-section' }, [
@@ -135,7 +134,7 @@ return L.view.extend({
             ])
         ]);
 
-        // ===== 放行网络检测 =====
+        // ===== 日志检测 =====
         var altResult = E('div', {
             'style': 'margin-top:10px;color:var(--text-color-high,#eee)'
         }, _('No data'));
@@ -151,7 +150,7 @@ return L.view.extend({
                     }
 
                     altResult.innerHTML = ips.map(ip =>
-                        `<div style="margin:4px 0;color:var(--text-color-high,#eee)">
+                        `<div style="margin:4px 0">
                             <span style="font-weight:bold">${ip}</span>
                             <button class="btn cbi-button" style="margin-left:8px" data-ip="${ip}">
                                 ${_('Add')}
@@ -162,17 +161,14 @@ return L.view.extend({
                     altResult.querySelectorAll('button').forEach(btn => {
                         btn.addEventListener('click', () => {
                             let ip = btn.getAttribute('data-ip');
-                            // 修改此处：将/32改为/24
                             let cidr = this.ipToCidr24(ip);
-                            
+
                             if (!cidr) {
                                 btn.innerText = _('Invalid IP');
                                 return;
                             }
 
                             let sections = uci.sections('igmpproxy', 'phyint');
-
-                            // ✅ 只找 upstream
                             let upstream = sections.find(s => s.direction === 'upstream');
 
                             if (upstream) {
@@ -185,7 +181,12 @@ return L.view.extend({
                                 if (!list.includes(cidr)) {
                                     list.push(cidr);
                                     uci.set('igmpproxy', sid, 'altnet', list);
-                                    uci.save('igmpproxy');
+
+                                    uci.save().then(() => {
+                                        if (uci.apply)
+                                            return uci.apply();
+                                    });
+
                                     btn.innerText = _('Added');
                                 } else {
                                     btn.innerText = _('Exists');
@@ -195,7 +196,6 @@ return L.view.extend({
                             }
                         });
                     });
-
                 });
             }
         }, _('Find Alternative Networks'));
@@ -208,7 +208,9 @@ return L.view.extend({
 
         // 自动刷新
         if (!this.statusPoll) {
-            this.statusPoll = poll.add(() => this.updateStatus(statusText, btnStart, btnStop, btnRestart));
+            this.statusPoll = poll.add(() =>
+                this.updateStatus(statusText, btnStart, btnStop, btnRestart)
+            );
         }
 
         // ===== General Settings =====
@@ -237,8 +239,9 @@ return L.view.extend({
         s = m.section(form.GridSection, 'phyint', _('Physical Interfaces'));
         s.anonymous = false;
         s.addremove = true;
-        s.description = _('Configure physical interfaces for multicast routing.\"Disabled\" is applicable to \"lo\" or \"loopback\" interface');
+        s.description = _('Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback" interface');
 
+        // ✅ 保留原来的表格干净处理
         var origRender = s.render;
         s.render = function() {
             return origRender.apply(this, arguments).then(node => {
@@ -251,10 +254,12 @@ return L.view.extend({
         o.value('upstream', _('Upstream (toward source)'));
         o.value('downstream', _('Downstream (toward receivers)'));
         o.value('disabled', _('Disabled'));
-        o.default = 'downstream';
-
+        //o.default = 'downstream';
         o = s.option(widgets.DeviceSelect, 'network', _('Network Interface'));
-        o.rmempty = false;
+        o.rmempty = true;
+        //o.nocreate = false;
+       // o.optional = false;
+       // o.unspecified = true;
         o.description = _('Select the network interface to use.');
         o.cfgvalue = function(section_id) {
             var v = uci.get('igmpproxy', section_id, 'network');
@@ -272,6 +277,7 @@ return L.view.extend({
             return uci.set('igmpproxy', section_id, 'network', value);
         };
 
+
         o = s.option(widgets.ZoneSelect, 'zone', _('Firewall Zone'));
         o.description = _('Assign this interface to a firewall zone');
 
@@ -280,10 +286,13 @@ return L.view.extend({
         o.datatype = 'list(cidr)';
         o.description = _('Define additional networks allowed to join multicast.');
 
-        return m.render().then(node => {
-            node.insertBefore(statusBar, node.firstChild);
-            node.insertBefore(altSection, node.firstChild.nextSibling);
-            return node;
+        // 返回最终节点
+        return m.render().then(formNode => {
+            return E([
+                statusBar,
+                altSection,
+                formNode
+            ]);
         });
     }
 });
