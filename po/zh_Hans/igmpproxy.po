@@ -28,18 +28,6 @@ msgstr "日志详细级别"
 msgid "0=none, 1=minimal, 2=more, 3=max"
 msgstr "0=无，1=最少，2=适中，3=最大"
 
-msgid "0 - None"
-msgstr "0 - 无"
-
-msgid "1 - Minimal"
-msgstr "1 - 最少"
-
-msgid "2 - More"
-msgstr "2 - 适中"
-
-msgid "3 - Maximum"
-msgstr "3 - 最大"
-
 msgid "Physical Interfaces"
 msgstr "接口设置"
 
