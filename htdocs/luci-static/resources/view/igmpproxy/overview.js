@@ -47,6 +47,26 @@ return L.view.extend({
         return fs.exec('/etc/init.d/igmpproxy', [action]);
     },
 
+    // ===== 新增：从日志查找附加网络 =====
+    findAltNetworks: function() {
+        return fs.exec('/sbin/logread', ['-e', 'igmpproxy']).then(res => {
+            if (res.code !== 0)
+                return [];
+
+            let lines = res.stdout.split('\n');
+            let ips = new Set();
+
+            lines.forEach(line => {
+                let match = line.match(/The source address ([0-9.]+).*not in any valid net/);
+                if (match && match[1]) {
+                    ips.add(match[1]);
+                }
+            });
+
+            return Array.from(ips);
+        });
+    },
+
     updateStatus: function(statusText, btnStart, btnStop, btnRestart) {
         return fs.exec('/bin/pidof', ['igmpproxy']).then(res => {
             if (res.code === 0 && res.stdout.trim()) {
@@ -102,6 +122,61 @@ return L.view.extend({
             E('div', { 'style': 'margin-top:10px' }, [
                 btnStart, ' ', btnStop, ' ', btnRestart, ' ', btnRefresh
             ])
+        ]);
+
+        // ===== 新增：附加网络检测UI =====
+        var altResult = E('div', {
+            'style': 'margin-top:10px;color:var(--text-color-high,#eee)'
+        }, _('No data'));
+
+        var btnFindAlt = E('button', {
+            'class': 'btn cbi-button',
+            'click': () => {
+                altResult.innerHTML = _('Scanning logs...');
+                this.findAltNetworks().then(ips => {
+                    if (!ips.length) {
+                        altResult.innerHTML = _('No alternative network addresses found.');
+                        return;
+                    }
+
+                    altResult.innerHTML = ips.map(ip => 
+                        `<div>${ip} <button class="btn cbi-button" data-ip="${ip}">${_('Add')}</button></div>`
+                    ).join('');
+
+                    altResult.querySelectorAll('button').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            let ip = btn.getAttribute('data-ip');
+                            let cidr = ip + '/32';
+
+                            let sections = uci.sections('igmpproxy', 'phyint');
+
+                            if (sections.length) {
+                                let sid = sections[0]['.name'];
+                                let list = uci.get('igmpproxy', sid, 'altnet') || [];
+
+                                if (!Array.isArray(list))
+                                    list = [list];
+
+                                if (!list.includes(cidr)) {
+                                    list.push(cidr);
+                                    uci.set('igmpproxy', sid, 'altnet', list);
+                                    uci.save('igmpproxy');
+                                    btn.innerText = _('Added');
+                                } else {
+                                    btn.innerText = _('Exists');
+                                }
+                            }
+                        });
+                    });
+
+                });
+            }
+        }, _('Find Alternative Networks'));
+
+        var altSection = E('div', { 'class': 'cbi-section' }, [
+            E('p', {}, _('Detect alternative networks from logs:')),
+            btnFindAlt,
+            altResult
         ]);
 
         // 自动刷新状态
@@ -180,6 +255,7 @@ return L.view.extend({
 
         return m.render().then(node => {
             node.insertBefore(statusBar, node.firstChild);
+            node.insertBefore(altSection, node.firstChild.nextSibling);
             return node;
         });
     }
