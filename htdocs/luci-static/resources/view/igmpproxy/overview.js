@@ -47,7 +47,7 @@ return L.view.extend({
         return fs.exec('/etc/init.d/igmpproxy', [action]);
     },
 
-    // ===== 新增：从日志查找附加网络 =====
+    // ===== 日志解析 =====
     findAltNetworks: function() {
         return fs.exec('/sbin/logread', ['-e', 'igmpproxy']).then(res => {
             if (res.code !== 0)
@@ -113,7 +113,7 @@ return L.view.extend({
         var btnRefresh = E('button', {
             'class': 'btn cbi-button',
             'click': function() {
-                window.location.reload(true); // 强制刷新页面
+                window.location.reload(true);
             }
         }, _('Refresh'));
 
@@ -124,7 +124,7 @@ return L.view.extend({
             ])
         ]);
 
-        // ===== 新增：附加网络检测UI =====
+        // ===== 放行网络检测 =====
         var altResult = E('div', {
             'style': 'margin-top:10px;color:var(--text-color-high,#eee)'
         }, _('No data'));
@@ -139,8 +139,13 @@ return L.view.extend({
                         return;
                     }
 
-                    altResult.innerHTML = ips.map(ip => 
-                        `<div>${ip} <button class="btn cbi-button" data-ip="${ip}">${_('Add')}</button></div>`
+                    altResult.innerHTML = ips.map(ip =>
+                        `<div style="margin:4px 0;color:var(--text-color-high,#eee)">
+                            <span style="font-weight:bold">${ip}</span>
+                            <button class="btn cbi-button" style="margin-left:8px" data-ip="${ip}">
+                                ${_('Add')}
+                            </button>
+                        </div>`
                     ).join('');
 
                     altResult.querySelectorAll('button').forEach(btn => {
@@ -150,8 +155,11 @@ return L.view.extend({
 
                             let sections = uci.sections('igmpproxy', 'phyint');
 
-                            if (sections.length) {
-                                let sid = sections[0]['.name'];
+                            // ✅ 只找 upstream
+                            let upstream = sections.find(s => s.direction === 'upstream');
+
+                            if (upstream) {
+                                let sid = upstream['.name'];
                                 let list = uci.get('igmpproxy', sid, 'altnet') || [];
 
                                 if (!Array.isArray(list))
@@ -165,6 +173,8 @@ return L.view.extend({
                                 } else {
                                     btn.innerText = _('Exists');
                                 }
+                            } else {
+                                btn.innerText = _('No upstream');
                             }
                         });
                     });
@@ -179,7 +189,7 @@ return L.view.extend({
             altResult
         ]);
 
-        // 自动刷新状态
+        // 自动刷新
         if (!this.statusPoll) {
             this.statusPoll = poll.add(() => this.updateStatus(statusText, btnStart, btnStop, btnRestart));
         }
