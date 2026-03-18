@@ -127,5 +127,8 @@ msgstr "添加"
 msgid "Added"
 msgstr "已添加"
 
-msgid "Exists"
+msgid "No upstream"
 msgstr "已存在"
+
+msgid "Exists"
+msgstr "请先新建组播上行方向"
