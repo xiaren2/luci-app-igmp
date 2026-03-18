@@ -105,3 +105,27 @@ msgstr "错误"
 
 msgid "Checking status..."
 msgstr "正在检测状态..."
+
+msgid "Find Alternative Networks"
+msgstr "查找附加网络"
+
+msgid "Detect alternative networks from logs:"
+msgstr "从日志中检测附加网络："
+
+msgid "Scanning logs..."
+msgstr "正在扫描日志..."
+
+msgid "No alternative network addresses found."
+msgstr "未找到附加网络地址"
+
+msgid "No data"
+msgstr "暂无数据"
+
+msgid "Add"
+msgstr "添加"
+
+msgid "Added"
+msgstr "已添加"
+
+msgid "Exists"
+msgstr "已存在"
