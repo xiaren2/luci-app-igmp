@@ -53,25 +53,22 @@ return L.view.extend({
                 let pids = res.stdout.trim().split(/\s+/);
                 let pidText = pids.join(', ');
 
-                statusText.innerHTML = '<b style="color:green">Running</b> (PID: ' + pidText + ')';
-
+                statusText.innerHTML = '<b style="color:green">' + _('Running') + '</b> (PID: ' + pidText + ')';
                 btnStart.disabled = true;
                 btnStop.disabled = false;
                 btnRestart.disabled = false;
             } else {
-                statusText.innerHTML = '<b style="color:red">Stopped</b>';
-
+                statusText.innerHTML = '<b style="color:red">' + _('Stopped') + '</b>';
                 btnStart.disabled = false;
                 btnStop.disabled = true;
                 btnRestart.disabled = true;
             }
         }).catch(() => {
-            statusText.innerHTML = '<b style="color:red">Error</b>';
+            statusText.innerHTML = '<b style="color:red">' + _('Error') + '</b>';
         });
     },
 
     render: function() {
-
         var m = new form.Map('igmpproxy', _('IGMP Proxy'),
             _('IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2'));
 
@@ -93,11 +90,10 @@ return L.view.extend({
             'click': L.bind(() => this.handleService('restart'), this)
         }, _('Restart'));
 
-        // ⭐ 强制刷新页面按钮（核心）
         var btnRefresh = E('button', {
             'class': 'btn cbi-button',
             'click': function() {
-                window.location.href = window.location.pathname + '?_=' + Date.now();
+                window.location.reload(true); // 强制刷新页面
             }
         }, _('Refresh'));
 
@@ -109,9 +105,11 @@ return L.view.extend({
         ]);
 
         // 自动刷新状态
-        poll.add(() => this.updateStatus(statusText, btnStart, btnStop, btnRestart));
+        if (!this.statusPoll) {
+            this.statusPoll = poll.add(() => this.updateStatus(statusText, btnStart, btnStop, btnRestart));
+        }
 
-        // ===== General =====
+        // ===== General Settings =====
         var igmpSections = uci.sections('igmpproxy', 'igmpproxy');
         var sid = igmpSections.length ? igmpSections[0]['.name'] : 'config';
 
@@ -133,7 +131,7 @@ return L.view.extend({
         o.default = '1';
         o.description = _('0=none, 1=minimal, 2=more, 3=max');
 
-        // ===== 接口 =====
+        // ===== Physical Interfaces =====
         s = m.section(form.GridSection, 'phyint', _('Physical Interfaces'));
         s.anonymous = false;
         s.addremove = true;
@@ -156,11 +154,9 @@ return L.view.extend({
         o = s.option(widgets.DeviceSelect, 'network', _('Network Interface'));
         o.rmempty = false;
         o.description = _('Select the network interface to use.');
-
         o.cfgvalue = function(section_id) {
             var v = uci.get('igmpproxy', section_id, 'network');
             if (!v) return v;
-
             var nets = uci.sections('network');
             for (var i = 0; i < nets.length; i++) {
                 if (nets[i]['.name'] === v && nets[i]['.type'] === 'interface')
@@ -168,11 +164,9 @@ return L.view.extend({
             }
             return v;
         };
-
         o.write = function(section_id, value) {
             if (value && value.startsWith('@'))
                 value = value.slice(1);
-
             return uci.set('igmpproxy', section_id, 'network', value);
         };
 
