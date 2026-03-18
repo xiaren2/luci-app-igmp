@@ -78,3 +78,30 @@ msgstr "定义允许加入组播的附加网络，查询日志决定上行可直
 
 msgid "IGMP Proxy allows multicast traffic to be properly forwarded between networks，ipv4 only.by:github.com/xiaren2"
 msgstr "IGMPPROXY允许在网络间正确转发组播流量，仅支持ipv4，igmpproxy仅支持一个上行，多个下行。by:github.com/xiaren2"
+
+msgid "Start"
+msgstr "启动"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Restart"
+msgstr "重启"
+
+msgid "Refresh"
+msgstr "刷新"
+
+msgid "Status: "
+msgstr "运行状态："
+
+msgid "Running"
+msgstr "运行中"
+
+msgid "Stopped"
+msgstr "未运行"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Checking status..."
+msgstr "正在检测状态..."
