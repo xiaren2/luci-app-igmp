@@ -269,7 +269,7 @@ return L.view.extend({
 
         // ===== Physical Interfaces =====
         s = m.section(form.GridSection, 'phyint', _('Physical Interfaces'));
-        s.anonymous = ture;   //不需要输入名称
+        s.anonymous = true;   //不需要输入名称
         // s.anonymous = false; //需要输入名称
         s.addremove = true;
         s.description = _('Configure physical interfaces for multicast routing.If you need interfaces such as lo/loopback, you can customize the input');
