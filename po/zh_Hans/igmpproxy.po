@@ -31,8 +31,8 @@ msgstr "0=无，1=最少，2=适中，3=最大"
 msgid "Physical Interfaces"
 msgstr "接口设置"
 
-msgid "Configure physical interfaces for multicast routing.\"Disabled\" is applicable to \"lo\" or \"loopback\" interface"
-msgstr "配置用于组播路由的接口，“禁用”适用于lo或者loopback接口，下拉没有时可自行创建。如果保存后/etc/igmpproxy.conf无法生成对应行说明接口选择错误，应该优先选择别名接口。"
+msgid "Configure physical interfaces for multicast routing.If you need interfaces such as lo/loopback, you can customize the input"
+msgstr "配置用于组播路由的接口。lo/loopback等接口，下拉没有时可自定义输入。如果保存后/etc/igmpproxy.conf无法生成对应行说明接口选择错误。"
 
 msgid "Add Interface"
 msgstr "添加接口"
@@ -56,7 +56,7 @@ msgid "Network Interface"
 msgstr "网络接口"
 
 msgid "Select the network interface to use."
-msgstr "选择要使用的网络接口，请先选择别名接口"
+msgstr "选择要使用的网络接口。下拉没有你需要的接口时，请自行创建"
 
 msgid "Firewall Zone"
 msgstr "防火墙区域"
