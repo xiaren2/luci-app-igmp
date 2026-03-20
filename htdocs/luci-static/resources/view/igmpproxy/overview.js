@@ -271,7 +271,7 @@ return L.view.extend({
         s = m.section(form.GridSection, 'phyint', _('Physical Interfaces'));
         s.anonymous = false;
         s.addremove = true;
-        s.description = _('Configure physical interfaces for multicast routing."Disabled" is applicable to "lo" or "loopback" interface');
+        s.description = _('Configure physical interfaces for multicast routing.If you need interfaces such as lo/loopback, you can customize the input');
 
         // ✅ 保留原来的表格干净处理
         var origRender = s.render;
