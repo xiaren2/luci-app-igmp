@@ -48,22 +48,38 @@ return L.view.extend({
         return fs.exec('/etc/init.d/igmpproxy', [action]);
     },
 
-    findAltNetworks: function() {
+  findAltNetworks: function() {
         return fs.exec('/sbin/logread', ['-e', 'igmpproxy']).then(res => {
-            if (res.code !== 0)
-                return [];
+            if (res.code !== 0) {
+                return { ips: [], hasError: true };
+            }
 
-            let lines = res.stdout.split('\n');
+            if (!res.stdout || res.stdout.trim() === '') {
+                return { ips: [], hasError: false, noLogs: true };
+            }
+
+            let lines = res.stdout.trim().split('\n');
             let ips = new Set();
+            let foundLogs = false;
 
             lines.forEach(line => {
-                let match = line.match(/The source address ([0-9.]+).*not in any valid net/);
-                if (match && match[1]) {
-                    ips.add(match[1]);
+                if (line.includes('igmpproxy')) {
+                    foundLogs = true;
+                    let match = line.match(/The source address ([0-9.]+).*not in any valid net/);
+                    if (match && match[1]) {
+                        ips.add(match[1]);
+                    }
                 }
             });
 
-            return Array.from(ips);
+            if (!foundLogs) {
+                return { ips: [], hasError: false, noLogs: true };
+            }
+
+            return { ips: Array.from(ips), hasError: false, noLogs: false };
+        }).catch(err => {
+            console.error('Error in findAltNetworks:', err);
+            return { ips: [], hasError: true, errorMsg: err.message };
         });
     },
 
@@ -134,7 +150,7 @@ return L.view.extend({
             ])
         ]);
 
-        // ===== 日志检测 =====
+           // ===== 日志检测 =====
         var altResult = E('div', {
             'style': 'margin-top:10px;color:var(--text-color-high,#eee)'
         }, _('No data'));
@@ -142,14 +158,27 @@ return L.view.extend({
         var btnFindAlt = E('button', {
             'class': 'btn cbi-button',
             'click': () => {
-                altResult.innerHTML = _('Scanning logs...');
-                this.findAltNetworks().then(ips => {
-                    if (!ips.length) {
+                altResult.innerHTML = '<span style="color:orange">' + _('Scanning logs...') + '</span>';
+                this.findAltNetworks().then(result => {
+                    if (result.hasError) {
+                        altResult.innerHTML = '<span style="color:red">' + _('Error scanning logs') + '</span>';
+                        return;
+                    }
+                    
+                    if (result.noLogs) {
+                        altResult.innerHTML = '<span style="color:#888">' + 
+                            _('No igmpproxy logs found.') + '<br>' +
+                            _('Please ensure IGMP Proxy is running and try playing multicast streams.') + 
+                            '</span>';
+                        return;
+                    }
+                    
+                    if (!result.ips || result.ips.length === 0) {
                         altResult.innerHTML = _('No alternative network addresses found.');
                         return;
                     }
 
-                    altResult.innerHTML = ips.map(ip =>
+                    altResult.innerHTML = result.ips.map(ip =>
                         `<div style="margin:4px 0">
                             <span style="font-weight:bold">${ip}</span>
                             <button class="btn cbi-button" style="margin-left:8px" data-ip="${ip}">
@@ -196,6 +225,9 @@ return L.view.extend({
                             }
                         });
                     });
+                }).catch(err => {
+                    console.error('Failed to scan logs:', err);
+                    altResult.innerHTML = '<span style="color:red">' + _('Scan failed') + '</span>';
                 });
             }
         }, _('Find Alternative Networks'));
