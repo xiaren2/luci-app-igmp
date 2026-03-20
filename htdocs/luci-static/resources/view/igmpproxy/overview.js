@@ -287,12 +287,16 @@ return L.view.extend({
         o.value('downstream', _('Downstream (toward receivers)'));
         o.value('disabled', _('Disabled'));
         //o.default = 'downstream';
-        o = s.option(widgets.DeviceSelect, 'network', _('Network Interface'));
+        
+        o = s.option(widgets.DeviceSelect, 'network', _('Network Interface'));  //显示物理接口等
+        o = s.option(widgets.NetworkSelect, 'network', _('Network Interface'));   //只显示别名接口
         o.rmempty = true;
         //o.nocreate = false;
        // o.optional = false;
        // o.unspecified = true;
         o.description = _('Select the network interface to use.');
+        //下面内容只在选择物理接口时候打开
+        /*
         o.cfgvalue = function(section_id) {
             var v = uci.get('igmpproxy', section_id, 'network');
             if (!v) return v;
@@ -308,7 +312,7 @@ return L.view.extend({
                 value = value.slice(1);
             return uci.set('igmpproxy', section_id, 'network', value);
         };
-
+*/
 
         o = s.option(widgets.ZoneSelect, 'zone', _('Firewall Zone'));
         o.description = _('Assign this interface to a firewall zone');
