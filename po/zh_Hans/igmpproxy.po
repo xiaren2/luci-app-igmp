@@ -110,7 +110,7 @@ msgid "Find Alternative Networks"
 msgstr "查找附加网络"
 
 msgid "Detect alternative networks from logs:"
-msgstr "从日志中检测附加网络："
+msgstr "从日志中(日志级别别选0)检测附加网络："
 
 msgid "Scanning logs..."
 msgstr "正在扫描日志..."
@@ -132,3 +132,22 @@ msgstr "请先新建组播上行后再添加"
 
 msgid "Exists"
 msgstr "已存在"
+
+msgid "Error scanning logs"
+msgstr "扫描日志出错"
+
+msgid "No igmpproxy logs found."
+msgstr "未找到 igmpproxy 日志。"
+
+msgid "Please ensure IGMP Proxy is running and try playing multicast streams."
+msgstr "请确保 igmpproxy 正在运行并尝试播放组播流。"
+
+msgid "Invalid IP"
+msgstr "无效IP"
+
+msgid "Scan failed"
+msgstr "扫描失败"
+
+
+msgid "The source address %s is not in any valid net"
+msgstr "源地址 %s 不在任何有效网络中"
