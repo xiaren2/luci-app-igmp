@@ -289,7 +289,7 @@ return L.view.extend({
         o.value('disabled', _('Disabled'));
         //o.default = 'downstream';
         
-        o = s.option(widgets.DeviceSelect, 'network', _('Network Interface'));  //显示物理接口等
+       // o = s.option(widgets.DeviceSelect, 'network', _('Network Interface'));  //显示物理接口等
         o = s.option(widgets.NetworkSelect, 'network', _('Network Interface'));   //只显示别名接口
         o.rmempty = true;
         //o.nocreate = false;
